@@ -1,3 +1,14 @@
 {
-"test":"test"
+  "TemplateId": "chrisProjectTemplate1",
+  "SshUrl": "https://github.com/ChrisGilchrist/ChrisProjectTemplate1.git",
+  "Branch": "main",
+  "Name": "Chris Project Template 1",
+  "Description": "A randomly generated project descriptor for demonstration purposes.",
+  "Tags": {
+    "languages": [ "csharp", "typescript" ],
+    "category": [ "sample", "demo" ]
+  },
+  "ImageFile": "demo-image.png",
+  "ReadmeFile": "README.md",
+  "Published": true
 }

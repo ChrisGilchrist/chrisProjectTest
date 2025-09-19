@@ -1,0 +1,17 @@
+name: demo-data-source
+language: python
+variables:
+  - name: output
+    inputType: OutputTopic
+    multiline: false
+    description: Name of the output topic to write into
+    defaultValue: first_topic
+    required: true
+  - name: k
+    inputType: InputTopic
+    multiline: false
+    defaultValue: first_topic
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: main.py
+libraryItemId: demo-data-source

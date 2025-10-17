@@ -45,6 +45,38 @@ deployments:
         inputType: Secret
         description: The optional InfluxDB Token to use
         secretKey: INFLUXDB_ADMIN_TOKEN
+  - name: InfluxDB v2
+    application: influxdb-v2
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 1000
+      memory: 8000
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: influxdb
+    network:
+      serviceName: influxdb
+      ports:
+        - port: 80
+          targetPort: 8086
+    variables:
+      - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+        inputType: Secret
+        description: Default Admin Token to initialize Influx with
+        required: true
+        secretKey: INFLUX_ADMIN_TOKEN
+      - name: DOCKER_INFLUXDB_INIT_PASSWORD
+        inputType: Secret
+        description: Default Admin password to initialize Influx with
+        required: true
+        secretKey: ADMIN_PASSWORD
+      - name: DOCKER_INFLUXDB_INIT_BUCKET
+        inputType: FreeText
+        description: Bucket Name to initialize Influx with
+        required: true
+        value: demo
 
 # This section describes the Topics of the data pipeline
 topics:

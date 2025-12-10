@@ -48,6 +48,24 @@ deployments:
       globalItem:
         show: true
         label: Wheel
+  - name: Basic Angular App
+    application: angular-starter-template
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: The topic to read from
+        required: true
+        value: hello-world-source
+      - name: bearer_token
+        inputType: FreeText
+        description: ''
+        value: ''
 
 # This section describes the Topics of the data pipeline
 topics:

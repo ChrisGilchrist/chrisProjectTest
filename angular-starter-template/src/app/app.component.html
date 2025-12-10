@@ -1,0 +1,34 @@
+<div class="app">
+  <header class="app-header">
+    <img src="assets/angular-logo.svg" class="app-logo" alt="Angular logo">
+
+    @if (isLoading()) {
+      <p>Connecting to Quix...</p>
+    } @else if (error()) {
+      <p class="error">Error: {{ error() }}</p>
+    } @else {
+      <div class="send-form">
+        <p class="form-description">
+          Send a string value to the <strong>{{ inputTopic() }}</strong> topic.
+          <br>The message will be displayed in the Live Data section below.
+        </p>
+        <div class="input-group">
+          <input
+            type="text"
+            [value]="inputValue()"
+            (input)="updateInputValue($any($event.target).value)"
+            (keyup.enter)="sendData()"
+            placeholder="Enter message..."
+          >
+          <button (click)="sendData()">Send Data</button>
+        </div>
+      </div>
+
+      <div class="panels">
+        <app-active-streams [streams]="activeStreams()" />
+        <app-live-data [data]="latestData()" />
+        <app-events [event]="latestEvent()" />
+      </div>
+    }
+  </header>
+</div>

@@ -35,6 +35,18 @@ deployments:
       ports:
         - port: 80
           targetPort: 8081
+    plugin:
+      embeddedView:
+        enabled: true
+        default: true
+      sidebarItem:
+        show: true
+        label: Chat
+        icon: chat
+        order: 1
+      globalItem:
+        show: true
+        label: Chat
 
 # This section describes the Topics of the data pipeline
 topics:

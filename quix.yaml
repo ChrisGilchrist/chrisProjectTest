@@ -39,14 +39,15 @@ deployments:
       embeddedView:
         enabled: true
         default: true
+        hideHeader: true
       sidebarItem:
         show: true
-        label: Chat
-        icon: chat
+        label: Spin the wheel
+        icon: wheel
         order: 1
       globalItem:
         show: true
-        label: Chat
+        label: wWheel
 
 # This section describes the Topics of the data pipeline
 topics:

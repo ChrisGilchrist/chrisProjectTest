@@ -1,9 +1,221 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello</title>
+    <title>Spin the Wheel</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #00d9ff;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        .wheel-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            margin-bottom: 30px;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff4444;
+            z-index: 10;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+        }
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: #16213e;
+            border-radius: 50%;
+            border: 4px solid #00d9ff;
+            z-index: 5;
+        }
+        button {
+            padding: 18px 50px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 8px;
+            background: #00d9ff;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: #00b8d9;
+            transform: scale(1.05);
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 25px;
+            font-size: 2rem;
+            min-height: 50px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, my name is Chris</h1>
+    <h1>Spin the Wheel!</h1>
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="500" height="500"></canvas>
+        <div class="center-circle"></div>
+    </div>
+    <button id="spinBtn" onclick="spin()">SPIN</button>
+    <div class="result" id="result"></div>
+
+    <script>
+        const prizes = [
+            { label: '$100', color: '#ff6b6b' },
+            { label: '$200', color: '#4ecdc4' },
+            { label: '$500', color: '#ffe66d' },
+            { label: 'BANKRUPT', color: '#2d3436' },
+            { label: '$300', color: '#a29bfe' },
+            { label: '$1000', color: '#00d9ff' },
+            { label: '$150', color: '#fd79a8' },
+            { label: 'LOSE TURN', color: '#636e72' }
+        ];
+
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const resultDiv = document.getElementById('result');
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = canvas.width / 2 - 5;
+
+        function drawWheel(rotation = 0) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const segmentAngle = (2 * Math.PI) / prizes.length;
+
+            prizes.forEach((prize, i) => {
+                const startAngle = i * segmentAngle + rotation;
+                const endAngle = startAngle + segmentAngle;
+
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = prize.color;
+                ctx.fill();
+                ctx.strokeStyle = '#16213e';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Draw text
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + segmentAngle / 2);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = prize.label === 'BANKRUPT' || prize.label === 'LOSE TURN' ? '#fff' : '#000';
+                ctx.font = 'bold 20px Arial';
+                ctx.fillText(prize.label, radius - 20, 6);
+                ctx.restore();
+            });
+
+            // Outer ring
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#00d9ff';
+            ctx.lineWidth = 6;
+            ctx.stroke();
+        }
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinBtn.disabled = true;
+            resultDiv.textContent = '';
+
+            const spins = 5 + Math.random() * 5;
+            const randomAngle = Math.random() * 360;
+            const targetRotation = currentRotation + (spins * 360) + randomAngle;
+
+            const startTime = performance.now();
+            const duration = 4000;
+            const startRotation = currentRotation;
+
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Easing function for smooth deceleration
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
+                drawWheel(currentRotation * Math.PI / 180);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    currentRotation = targetRotation;
+                    isSpinning = false;
+                    spinBtn.disabled = false;
+                    showResult();
+                }
+            }
+
+            function showResult() {
+                const finalAngle = currentRotation % 360;
+                const segmentAngle = 360 / prizes.length;
+                // Pointer is at top (270 degrees in canvas coordinates)
+                const adjustedAngle = (270 - finalAngle + 360) % 360;
+                const winningIndex = Math.floor(adjustedAngle / segmentAngle) % prizes.length;
+
+                const prize = prizes[winningIndex];
+                if (prize.label === 'BANKRUPT') {
+                    resultDiv.textContent = 'BANKRUPT! You lose everything!';
+                    resultDiv.style.color = '#ff4444';
+                } else if (prize.label === 'LOSE TURN') {
+                    resultDiv.textContent = 'LOSE A TURN!';
+                    resultDiv.style.color = '#ff4444';
+                } else {
+                    resultDiv.textContent = `You won ${prize.label}!`;
+                    resultDiv.style.color = '#00ff88';
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        drawWheel();
+    </script>
 </body>
 </html>

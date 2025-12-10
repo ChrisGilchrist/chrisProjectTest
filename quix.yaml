@@ -38,8 +38,8 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        default: true
         hideHeader: true
+        default: true
       sidebarItem:
         show: true
         label: Spin the wheel
@@ -53,3 +53,4 @@ deployments:
 topics:
   - name: first_topic
   - name: f1-data
+  - name: hello-world-source

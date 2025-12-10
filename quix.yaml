@@ -43,11 +43,11 @@ deployments:
       sidebarItem:
         show: true
         label: Spin the wheel
-        icon: wheel
+        icon: circle
         order: 1
       globalItem:
         show: true
-        label: wWheel
+        label: Wheel
 
 # This section describes the Topics of the data pipeline
 topics:

@@ -48,6 +48,7 @@ deployments:
       globalItem:
         show: true
         label: Wheel
+        order: 1
   - name: Basic Angular App
     application: angular-starter-template
     version: latest

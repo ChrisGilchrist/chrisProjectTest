@@ -42,7 +42,7 @@ deployments:
         default: true
       sidebarItem:
         show: true
-        label: Spin the wheel
+        label: Spin the wheeeeeeeeel
         icon: circle
         order: 1
       globalItem:

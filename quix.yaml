@@ -42,7 +42,7 @@ deployments:
         default: true
       sidebarItem:
         show: true
-        label: Spin the wheeeeeeeeel
+        label: Frontend App
         icon: circle
         order: 1
       globalItem:

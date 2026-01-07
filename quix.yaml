@@ -43,12 +43,12 @@ deployments:
       sidebarItem:
         show: true
         label: Frontend123
-        icon: arrow_upward
-        order: 1
+        icon: search
+        order: 0
       globalItem:
         show: true
         label: Wheel123
-        order: 0
+        order: 1
   - name: Basic Angular App
     application: angular-starter-template
     version: latest

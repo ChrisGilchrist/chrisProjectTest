@@ -83,7 +83,7 @@ deployments:
         show: true
         label: testtt
         order: 1
-        badge: jj
+        badge: jjcool
 
 # This section describes the Topics of the data pipeline
 topics:

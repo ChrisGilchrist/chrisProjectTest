@@ -42,9 +42,10 @@ deployments:
         default: true
       sidebarItem:
         show: true
-        label: Frontend App
+        label: Frontend App2
         icon: circle
         order: 1
+        badge: ''
       globalItem:
         show: true
         label: Wheel

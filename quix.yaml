@@ -44,7 +44,7 @@ deployments:
         show: true
         label: Frontend123
         icon: search
-        order: 0
+        order: 2
       globalItem:
         show: true
         label: Wheel123

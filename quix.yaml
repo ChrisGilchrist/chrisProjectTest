@@ -45,10 +45,12 @@ deployments:
         label: Frontend123
         icon: search
         order: 2
+        badge: cool
       globalItem:
         show: true
         label: Wheel123
         order: 1
+        badge: tetst223
   - name: Basic Angular App
     application: angular-starter-template
     version: latest

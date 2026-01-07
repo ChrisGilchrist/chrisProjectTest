@@ -42,13 +42,13 @@ deployments:
         default: true
       sidebarItem:
         show: true
-        label: Frontend Apoooooooo
+        label: Frontend123
         icon: arrow_upward
         order: 1
-        badge: ''
       globalItem:
         show: true
-        label: Wheel
+        label: Wheel123
+        order: 0
   - name: Basic Angular App
     application: angular-starter-template
     version: latest

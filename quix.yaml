@@ -78,7 +78,7 @@ deployments:
         label: test
         icon: home
         order: 0
-        badge: jj
+        badge: jjkkkkkk
       globalItem:
         show: true
         label: testtt

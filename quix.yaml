@@ -43,7 +43,7 @@ deployments:
       sidebarItem:
         show: true
         label: Frontend Apoooooooo
-        icon: circle
+        icon: arrow_upward
         order: 1
         badge: ''
       globalItem:

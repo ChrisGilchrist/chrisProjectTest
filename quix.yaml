@@ -79,7 +79,7 @@ deployments:
       sidebarItem:
         show: true
         label: test
-        icon: home
+        icon: api
         order: 0
         badge: jjkkkkkk
       globalItem:

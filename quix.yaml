@@ -74,11 +74,9 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-      globalItem:
+      sidebarItem:
         show: true
-        label: testtt
-        order: 1
-        badge: jjcool
+        order: 0
 
 # This section describes the Topics of the data pipeline
 topics:

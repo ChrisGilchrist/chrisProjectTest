@@ -38,7 +38,6 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        hideHeader: false
         default: true
       sidebarItem:
         show: true
@@ -75,13 +74,6 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        hideHeader: false
-      sidebarItem:
-        show: true
-        label: test
-        icon: api
-        order: 0
-        badge: jjkkkkkk
       globalItem:
         show: true
         label: testtt

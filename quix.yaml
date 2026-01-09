@@ -38,7 +38,7 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        hideHeader: true
+        hideHeader: false
         default: true
       sidebarItem:
         show: true

@@ -42,7 +42,7 @@ deployments:
       sidebarItem:
         show: true
         label: Frontend123
-        icon: search
+        icon: power_settings_new
         order: 2
         badge: cool
       globalItem:

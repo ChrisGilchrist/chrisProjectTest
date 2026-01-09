@@ -75,6 +75,7 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
+        hideHeader: false
       sidebarItem:
         show: true
         label: test

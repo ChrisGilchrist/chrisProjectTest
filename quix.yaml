@@ -91,7 +91,7 @@ deployments:
       mongoHost: j
       mongoPort: jkkkkkkkkk
       mongoUser: j
-      mongoPasswordSecret: ADMIN_PASSWORD
+      mongoPasswordSecret: INFLUXDB_ADMIN_TOKEN
       mongoDatabase: j
       mongoCollection: j
     plugin:

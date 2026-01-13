@@ -83,6 +83,9 @@ deployments:
       cpu: 500
       memory: 1000
       replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: config-api-svc
     configuration:
       topic: j
       mongoHost: j
@@ -91,6 +94,10 @@ deployments:
       mongoPasswordSecret: ADMIN_PASSWORD
       mongoDatabase: j
       mongoCollection: j
+    plugin:
+      embeddedView:
+        enabled: true
+        default: true
 
 # This section describes the Topics of the data pipeline
 topics:

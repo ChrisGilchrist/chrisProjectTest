@@ -75,6 +75,22 @@ deployments:
       sidebarItem:
         show: true
         order: 0
+  - name: Dynamic Configuration Manager
+    application: DynamicConfiguration
+    version: latest
+    deploymentType: Managed
+    resources:
+      cpu: 500
+      memory: 1000
+      replicas: 1
+    configuration:
+      topic: j
+      mongoHost: j
+      mongoPort: j
+      mongoUser: j
+      mongoPasswordSecret: ADMIN_PASSWORD
+      mongoDatabase: j
+      mongoCollection: j
 
 # This section describes the Topics of the data pipeline
 topics:

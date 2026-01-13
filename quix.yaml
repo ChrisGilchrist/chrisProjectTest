@@ -89,7 +89,7 @@ deployments:
     configuration:
       topic: j
       mongoHost: j
-      mongoPort: j
+      mongoPort: jkkkk
       mongoUser: j
       mongoPasswordSecret: ADMIN_PASSWORD
       mongoDatabase: j

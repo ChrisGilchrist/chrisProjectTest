@@ -90,10 +90,11 @@ deployments:
       topic: first_topic
       mongoHost: jdgdfgdf
       mongoPort: jkkkkkkkkk
-      mongoUser: j
-      mongoPasswordSecret: INFLUXDB_ADMIN_TOKEN
-      mongoDatabase: j
-      mongoCollection: j
+      mongoUser: jtuyt
+      mongoPasswordSecret: INFLUX_ADMIN_TOKEN
+      mongoDatabase: jtyutuy
+      mongoCollection: juytuytt
+      workers: 1ytyu
     plugin:
       embeddedView:
         enabled: true

@@ -75,7 +75,7 @@ deployments:
       sidebarItem:
         show: true
         order: 0
-  - name: Dynamic Configuration Manager
+  - name: Dynamic Configuration Managerk
     application: DynamicConfiguration
     version: latest
     deploymentType: Managed

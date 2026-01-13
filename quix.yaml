@@ -8,7 +8,7 @@ metadata:
 deployments:
   - name: Demo Data Source
     application: demo-data-source
-    version: latest
+    version: 18677aa892b429eb4230774f7dc9fad466166d96
     deploymentType: Job
     resources:
       cpu: 200

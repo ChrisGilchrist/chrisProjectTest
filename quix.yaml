@@ -87,7 +87,7 @@ deployments:
       enabled: true
       urlPrefix: config-api-svc
     configuration:
-      topic: j
+      topic: first_topic
       mongoHost: j
       mongoPort: jkkkkkkkkk
       mongoUser: j

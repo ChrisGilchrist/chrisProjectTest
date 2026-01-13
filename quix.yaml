@@ -77,7 +77,7 @@ deployments:
         order: 0
   - name: Dynamic Configuration Managerk
     application: DynamicConfiguration
-    version: latest
+    version: 20251003.1-2025-10-user-flow
     deploymentType: Managed
     resources:
       cpu: 500

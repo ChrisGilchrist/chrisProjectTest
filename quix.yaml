@@ -42,7 +42,7 @@ deployments:
       sidebarItem:
         show: true
         label: Frontend123
-        icon: power_settings_new
+        icon: arrow_downward
         order: 2
       globalItem:
         show: true

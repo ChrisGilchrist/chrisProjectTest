@@ -74,9 +74,6 @@ deployments:
         enabled: true
         hideHeader: true
         default: true
-      sidebarItem:
-        show: true
-        order: 0
       globalItem:
         show: true
         order: 0

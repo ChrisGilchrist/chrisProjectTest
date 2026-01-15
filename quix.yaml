@@ -75,6 +75,9 @@ deployments:
       sidebarItem:
         show: true
         order: 0
+      globalItem:
+        show: true
+        order: 0
   - name: Dynamic Configuration Managerk
     application: DynamicConfiguration
     version: 20251003.1-2025-10-user-flow

@@ -70,8 +70,6 @@ deployments:
         description: ''
         value: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlpXeUJqWTgzcXotZW1pUlZDd1I4dyJ9.eyJpc3MiOiJodHRwczovL2F1dGguZGV2LnF1aXguYWkvIiwic3ViIjoiYXV0aDB8MjE5MWU0YjYtYzc0MC00ZWUyLTlmOTUtYTExNWQyNzBhNWMwIiwiYXVkIjpbImh0dHBzOi8vcG9ydGFsLWFwaS5kZXYucXVpeC5haS8iLCJodHRwczovL3F1aXgtZGV2LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3NjQ3NjgyODMsImV4cCI6MTc2NzM2MDI4Mywic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF6cCI6IjYwNEE5cTVWb2NZb3ZvTlBvTWlqdWVVWmNFSEljbE1zIiwicGVybWlzc2lvbnMiOltdfQ.sdJuHgmDiAhJHv5eEam6NsAJbNnU_BXRbMPpdv76LXj5ymHigmjKAa4PbP1SQFjEVPKl-O9y9p1oO8CLxIesvMKErV28lrpJ7ku75AqVP8_ASCtFj2v6ee1jeLTUnWcw_3I_UJ5FuFau4Ofwkj_rHbJb2yOF4OH2wfh8Mz_A4ciliPdnQhMwALKZRZvePxgDydQUi4xeZK_1CTKZV3ukRUBeD-vhK6lNrF12IMYOQJgfNTC6O2472Iz5b4IbWsADC1Nd-uFM8lAtT0EWjI_PY8DizF9uJtT4aNrNsN4pUxZbQiIgXbct0m5Y3Ay58t35efGngNBT03q5oAHPLmyjwg
     plugin:
-      embeddedView:
-        enabled: true
       sidebarItem:
         show: true
         order: 0

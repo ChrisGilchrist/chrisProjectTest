@@ -72,10 +72,10 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        hideHeader: true
         default: true
       globalItem:
         show: true
+        icon: build
         order: 0
   - name: Dynamic Configuration Managerk
     application: DynamicConfiguration

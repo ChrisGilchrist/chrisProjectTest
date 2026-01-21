@@ -93,6 +93,20 @@ deployments:
       embeddedView:
         enabled: true
         default: true
+  - name: Demo Data Source 2
+    application: demo-data-source-2
+    version: latest
+    deploymentType: Job
+    resources:
+      cpu: 200
+      memory: 200
+      replicas: 1
+    variables:
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write into
+        required: true
+        value: f1-data
 
 # This section describes the Topics of the data pipeline
 topics:

@@ -12,7 +12,7 @@ from qdrant_client.models import PointStruct, VectorParams, Distance
 # ----------------------------
 # Config
 # ----------------------------
-DOCS_DIR = "./quix-docs"          # Local clone of https://github.com/quixio/quix-docs
+DOCS_DIR = "./quix-docs-main"          # Local clone of https://github.com/quixio/quix-docs
 COLLECTION_NAME = "quix_docs"
 QDRANT_URL = "http://localhost:6333"
 HASHES_FILE = "file_hashes.json"  # Stores hashes of files to track changes

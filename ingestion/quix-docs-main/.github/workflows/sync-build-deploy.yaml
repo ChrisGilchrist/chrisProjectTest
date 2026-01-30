@@ -1,0 +1,145 @@
+name: Deploy Prod from MAIN branch
+
+on:
+  # Runs on pushes targeting the default branch
+  #push:
+  #  branches: [$default-branch]
+
+  # Runs when cli updates the docs
+  repository_dispatch:
+    types: [cli_docs_updated]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+# Default to bash
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main branch of Docs Prod repo
+        uses: actions/checkout@v3
+        with:
+         ref: main
+         
+#      - name: Merge dev -> main
+#        uses: devmasx/merge-branch@master
+#        with:
+#          type: now
+#          from_branch: dev
+#          target_branch: main
+#          github_token: ${{ github.token }}
+         
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - name: Add Python Setup Tools
+        run: python -m pip install --upgrade pip setuptools wheel
+        
+      # Needed when using more than one repo
+      # add 'monorepo' to mkdocs.yml file under plugins
+      - name: Install MKdocs Monorepo Plugin
+        run: pip install mkdocs-monorepo-plugin
+
+      # Adds requirements for social plugin. Needed to automatically fill out meta data.
+      # add 'social' to mkdocs.yml file under plugins
+      - run: pip install cffi pillow cairosvg
+
+      - run: pip install mkdocs-exclude-search
+
+      # Material extension now part of mkdocs
+      - run: pip install mkdocs-material-extensions
+
+      # add mkdocs-redirects
+      # zoom images
+      - name: Install mkdocs-redirects
+        run: pip install mkdocs-redirects
+        
+      # add lightbox
+      # zoom images
+      - name: Install MkDocs Light Box
+        run: pip install mkdocs-glightbox
+
+      # add multirepo to support pulling docs from other repos
+      - name: Install multirepo
+        run: pip install mkdocs-multirepo-plugin
+     
+      # add include support for markdown
+      - name: Install include-markdown
+        run: pip install mkdocs-include-markdown-plugin
+      
+      - name: Install Mkdocs
+        run: pip install mkdocs
+        
+      # Install Material insiders theme
+      - name: Install Material theme
+        run: pip install mkdocs-material
+      
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v2
+
+      ####################################################
+      ### COPY AND MASSAGE Client Library DOCS REPO README INTO DOCS
+      ####################################################
+      # enable when there is an client library dev branch 
+      # - name: Extract branch name
+      #   shell: bash
+      #   run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      #   id: extract_branch
+        
+      ###### checkout client library files - latest version
+      - name: Checkout Client Library
+        uses: actions/checkout@v3
+        with:
+          repository: 'quixio/quix-streams'
+          ref: 'main' # when a dev branch exists we can get the dev content
+          #ref: '{{ steps.extract_branch.outputs.branch }}'
+          path: 'quix-streams'
+
+      ###
+
+      ####################################################
+      ### END
+      ####################################################
+
+      - name: Build MkDocs Site
+        run: mkdocs build --no-directory-urls
+        env:
+          AccessToken: ${{ secrets.QUIX_STREAMS_ACCESS_TOKEN }}
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          name: github-pages
+          path: ./site
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

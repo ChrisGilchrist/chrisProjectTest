@@ -3,5 +3,5 @@ python-dotenv==1.0.1
 sentence-transformers==2.2.2
 qdrant-client==1.16.2
 numpy==1.26.4
-markdown==3.7.1
+markdown==3.6
 beautifulsoup4==4.12.3

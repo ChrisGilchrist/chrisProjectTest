@@ -20,7 +20,15 @@ log = logging.getLogger("ingestion")
 # -------------------------------
 # Configuration
 # -------------------------------
-DOCS_ROOT = os.environ.get("DOCS_ROOT", "./ingestion/quix-docs-main/docs")
+# Try multiple paths for docs (container vs local development)
+if os.path.exists("./quix-docs-main/docs"):
+    DEFAULT_DOCS_ROOT = "./quix-docs-main/docs"
+elif os.path.exists("./ingestion/quix-docs-main/docs"):
+    DEFAULT_DOCS_ROOT = "./ingestion/quix-docs-main/docs"
+else:
+    DEFAULT_DOCS_ROOT = "./quix-docs-main/docs"  # Fallback
+
+DOCS_ROOT = os.environ.get("DOCS_ROOT", DEFAULT_DOCS_ROOT)
 COLLECTION = os.environ.get("QDRANT_COLLECTION", "quix_docs")
 QDRANT_URL = os.environ.get(
     "QDRANT_URL",

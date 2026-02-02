@@ -100,26 +100,29 @@ def main():
         client = QdrantClient(url=QDRANT_URL, timeout=180)
         log.info("✅ Connected to Qdrant")
 
-        # Check/create collection
+        # Delete existing collection if it exists (to clear duplicates)
         try:
             collections = client.get_collections()
             collection_names = [c.name for c in collections.collections]
             log.info(f"📚 Qdrant has {len(collection_names)} collections")
 
-            if COLLECTION not in collection_names:
-                log.info(f"📦 Creating collection: {COLLECTION}")
-                client.create_collection(
-                    collection_name=COLLECTION,
-                    vectors_config=VectorParams(
-                        size=384,  # MiniLM-L6-v2 embedding dimension
-                        distance=Distance.COSINE
-                    )
+            if COLLECTION in collection_names:
+                log.info(f"🗑️  Deleting existing collection: {COLLECTION}")
+                client.delete_collection(collection_name=COLLECTION)
+                log.info(f"✅ Collection {COLLECTION} deleted")
+
+            # Create fresh collection
+            log.info(f"📦 Creating collection: {COLLECTION}")
+            client.create_collection(
+                collection_name=COLLECTION,
+                vectors_config=VectorParams(
+                    size=384,  # MiniLM-L6-v2 embedding dimension
+                    distance=Distance.COSINE
                 )
-                log.info(f"✅ Collection {COLLECTION} created")
-            else:
-                log.info(f"✅ Collection {COLLECTION} exists")
+            )
+            log.info(f"✅ Collection {COLLECTION} created")
         except Exception as e:
-            log.error(f"❌ Collection check/creation failed: {e}")
+            log.error(f"❌ Collection setup failed: {e}")
             raise
 
         log.info(f"📂 Scanning docs in {DOCS_ROOT}")

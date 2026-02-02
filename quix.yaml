@@ -130,6 +130,25 @@ deployments:
       cpu: 200
       memory: 500
       replicas: 1
+  - name: ingestion-api
+    application: ingestion-api
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: This is the input topic to read data from
+        required: true
+        value: first_topic
+      - name: output
+        inputType: OutputTopic
+        description: This is the output topic to write data to
+        required: true
+        value: output-topic
 
 # This section describes the Topics of the data pipeline
 topics:

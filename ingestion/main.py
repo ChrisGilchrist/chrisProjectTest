@@ -138,13 +138,32 @@ def chunk_text(text, chunk_size=500):
         chunks.append(" ".join(words[i:i+chunk_size]))
     return chunks
 
-def build_docs_url(md_file):
+def build_docs_url(md_file, frontmatter_metadata=None):
+    """Build URL using frontmatter metadata for blog posts, file path for regular docs"""
     try:
         relative = md_file.relative_to(DOCS_ROOT)
     except ValueError:
         relative = md_file.name
-    # Convert .md to .html and use correct URL structure
-    url_path = str(relative).replace('.md', '.html')
+
+    relative_str = str(relative)
+
+    # Special handling for blog posts: use date-based URL structure
+    if 'blog/posts' in relative_str and frontmatter_metadata:
+        date = frontmatter_metadata.get('date')
+        slug = frontmatter_metadata.get('slug')
+
+        if date and slug:
+            # Convert date to URL format: 2023-07-12 -> 2023/07/12
+            if hasattr(date, 'strftime'):
+                date_str = date.strftime('%Y/%m/%d')
+            else:
+                # date is string like "2023-07-12"
+                date_str = str(date).replace('-', '/')
+
+            return f"https://quix.io/docs/blog/{date_str}/{slug}.html"
+
+    # Default: use file path structure for regular docs
+    url_path = relative_str.replace('.md', '.html')
     return f"https://quix.io/docs/{url_path}"
 
 # -------------------------------

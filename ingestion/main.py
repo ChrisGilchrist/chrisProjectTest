@@ -20,7 +20,7 @@ log = logging.getLogger("ingestion")
 # -------------------------------
 # Configuration
 # -------------------------------
-DOCS_ROOT = os.environ.get("DOCS_ROOT", "./quix-docs/docs")
+DOCS_ROOT = os.environ.get("DOCS_ROOT", "./ingestion/quix-docs-main/docs")
 COLLECTION = os.environ.get("QDRANT_COLLECTION", "quix_docs")
 QDRANT_URL = os.environ.get(
     "QDRANT_URL",

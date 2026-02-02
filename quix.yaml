@@ -118,10 +118,6 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: qdrant-qdrant-v1-8-3
-    network:
-      ports:
-        - port: 6300
-          targetPort: 80
   - name: ingestion
     application: ingestion
     version: latest

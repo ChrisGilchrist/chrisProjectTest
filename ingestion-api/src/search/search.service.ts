@@ -1,6 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { pipeline } from '@xenova/transformers';
 
 @Injectable()
 export class SearchService implements OnModuleInit {
@@ -27,6 +26,9 @@ export class SearchService implements OnModuleInit {
     this.logger.log(`🧠 Loading embedding model: ${modelName}`);
 
     try {
+      // Dynamically import the ES module
+      const { pipeline } = await import('@xenova/transformers');
+
       // Load the model using Transformers.js
       this.model = await pipeline('feature-extraction', modelName);
       this.modelReady = true;

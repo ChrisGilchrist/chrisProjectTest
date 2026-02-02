@@ -136,3 +136,4 @@ topics:
   - name: first_topic
   - name: hello-world-source
   - name: j
+  - name: output-topic

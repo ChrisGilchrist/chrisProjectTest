@@ -142,12 +142,19 @@ def main():
             if not chunks:
                 continue
 
-            vectors = model.encode(
-                chunks,
-                batch_size=16,
-                show_progress_bar=False
-            )
+            log.info(f"🔢 Starting encoding for {len(chunks)} chunks...")
+            try:
+                vectors = model.encode(
+                    chunks,
+                    batch_size=16,
+                    show_progress_bar=False
+                )
+                log.info(f"✅ Encoding complete, got {len(vectors)} vectors")
+            except Exception as e:
+                log.error(f"❌ Encoding failed: {e}")
+                raise
 
+            log.info(f"📦 Building {len(chunks)} point structures...")
             points = []
             for i, chunk in enumerate(chunks):
                 points.append(
@@ -162,9 +169,12 @@ def main():
                         }
                     )
                 )
+            log.info(f"✅ Built {len(points)} points")
 
             # Batch upsert with retry logic
             batch_size = 16
+            num_batches = (len(points)-1)//batch_size+1
+            log.info(f"📤 Upserting {len(points)} points in {num_batches} batches...")
             for i in range(0, len(points), batch_size):
                 batch = points[i:i+batch_size]
 

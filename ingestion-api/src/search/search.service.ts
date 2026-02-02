@@ -12,7 +12,7 @@ export class SearchService implements OnModuleInit {
 
   constructor() {
     this.collection = process.env.QDRANT_COLLECTION || 'quix_docs';
-    const url = process.env.QDRANT_URL || 'https://qdrant-qdrant-v1-8-3-quixdev-chrisprojecttest-env1.deployments-dev.quix.io';
+    const url = process.env.QDRANT_URL || 'http://qdrant:6333';
 
     if (!url) {
       throw new Error('QDRANT_URL not set in environment');

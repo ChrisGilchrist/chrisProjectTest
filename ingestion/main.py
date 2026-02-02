@@ -47,21 +47,56 @@ def read_markdown(md_file):
     with open(md_file, "r", encoding="utf-8") as f:
         return f.read()
 
-def markdown_to_text(md_content):
+def extract_sections_from_markdown(md_content):
+    """Extract sections with headers from markdown"""
     import re
-    # Remove HTML tags (including img, div, etc.)
-    text = re.sub(r"<[^>]+>", "", md_content)
-    # Remove markdown headings
-    text = re.sub(r"#+ ", "", text)
-    # Remove markdown links but keep text
-    text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)
+    sections = []
+
+    # Remove HTML tags first
+    content = re.sub(r"<[^>]+>", "", md_content)
     # Remove markdown images
-    text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
-    # Remove extra whitespace
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
+    content = re.sub(r"!\[.*?\]\(.*?\)", "", content)
+    # Remove markdown links but keep text
+    content = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", content)
+
+    lines = content.split('\n')
+    current_header = None
+    current_content = []
+
+    for line in lines:
+        # Check if line is a header (# or ## or ###)
+        header_match = re.match(r'^#{1,3}\s+(.+)$', line)
+        if header_match:
+            # Save previous section
+            if current_content:
+                text = ' '.join(current_content).strip()
+                text = re.sub(r'\s+', ' ', text)  # Clean whitespace
+                if text and len(text) > 20:  # Only keep substantial content
+                    sections.append({
+                        'header': current_header or 'Overview',
+                        'content': text[:500]  # Limit to 500 chars
+                    })
+            # Start new section
+            current_header = header_match.group(1).strip()
+            current_content = []
+        else:
+            if line.strip():
+                current_content.append(line.strip())
+
+    # Add last section
+    if current_content:
+        text = ' '.join(current_content).strip()
+        text = re.sub(r'\s+', ' ', text)
+        if text and len(text) > 20:
+            sections.append({
+                'header': current_header or 'Overview',
+                'content': text[:500]
+            })
+
+    return sections if sections else [{'header': 'Content', 'content': content[:500]}]
 
 def chunk_text(text, chunk_size=500):
+    """Fallback chunking if section extraction fails"""
     words = text.split()
     chunks = []
     for i in range(0, len(words), chunk_size):
@@ -147,18 +182,20 @@ def main():
             log.info(f"➡️ Processing {idx+1}/{len(md_files)}: {md_file}")
 
             raw_md = read_markdown(md_file)
-            text = markdown_to_text(raw_md)
-            chunks = chunk_text(text)
+            sections = extract_sections_from_markdown(raw_md)
 
-            log.info(f"✂️ {len(chunks)} chunks created")
+            log.info(f"✂️ {len(sections)} sections created")
 
-            if not chunks:
+            if not sections:
                 continue
 
-            log.info(f"🔢 Starting encoding for {len(chunks)} chunks...")
+            # Extract content for encoding
+            texts_to_encode = [s['content'] for s in sections]
+
+            log.info(f"🔢 Starting encoding for {len(texts_to_encode)} sections...")
             try:
                 vectors = model.encode(
-                    chunks,
+                    texts_to_encode,
                     batch_size=16,
                     show_progress_bar=False
                 )
@@ -167,18 +204,19 @@ def main():
                 log.error(f"❌ Encoding failed: {e}")
                 raise
 
-            log.info(f"📦 Building {len(chunks)} point structures...")
+            log.info(f"📦 Building {len(sections)} point structures...")
             points = []
-            for i, chunk in enumerate(chunks):
+            for i, section in enumerate(sections):
                 points.append(
                     PointStruct(
                         id=str(uuid.uuid4()),
                         vector=vectors[i].tolist(),
                         payload={
-                            "title": md_file.stem,
-                            "text": chunk,
+                            "title": section['header'],
+                            "text": section['content'],
                             "source_path": str(md_file),
                             "url": build_docs_url(md_file),
+                            "page_title": md_file.stem,
                         }
                     )
                 )

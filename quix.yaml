@@ -108,14 +108,16 @@ deployments:
         description: Name of the output topic to write into
         required: true
         value: f1-data
-  - name: ingestion
-    application: ingestion
-    version: latest
+  - name: Qdrant
+    image: qdrant/qdrant:v1.8.3
     deploymentType: Service
     resources:
       cpu: 200
       memory: 500
       replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: qdrant-qdrant-v1-8-3
 
 # This section describes the Topics of the data pipeline
 topics:

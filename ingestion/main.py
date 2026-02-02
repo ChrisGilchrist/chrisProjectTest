@@ -49,9 +49,17 @@ def read_markdown(md_file):
 
 def markdown_to_text(md_content):
     import re
-    text = re.sub(r"#+ ", "", md_content)  # remove headings
-    text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)  # remove links but keep text
-    return text
+    # Remove HTML tags (including img, div, etc.)
+    text = re.sub(r"<[^>]+>", "", md_content)
+    # Remove markdown headings
+    text = re.sub(r"#+ ", "", text)
+    # Remove markdown links but keep text
+    text = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", text)
+    # Remove markdown images
+    text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
+    # Remove extra whitespace
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
 
 def chunk_text(text, chunk_size=500):
     words = text.split()
@@ -65,7 +73,9 @@ def build_docs_url(md_file):
         relative = md_file.relative_to(DOCS_ROOT)
     except ValueError:
         relative = md_file.name
-    return f"https://docs.quix.io/{relative}"
+    # Convert .md to .html and use correct URL structure
+    url_path = str(relative).replace('.md', '.html')
+    return f"https://quix.io/docs/{url_path}"
 
 # -------------------------------
 # Graceful Shutdown

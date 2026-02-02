@@ -142,6 +142,10 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: ingestion-api-c7f9695
+    network:
+      ports:
+        - port: 80
+          targetPort: 3000
     variables:
       - name: input
         inputType: InputTopic

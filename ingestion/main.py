@@ -48,39 +48,65 @@ def read_markdown(md_file):
         return f.read()
 
 def extract_sections_from_markdown(md_content):
-    """Extract sections with headers from markdown"""
+    """Extract sections with headers from markdown using frontmatter"""
     import re
+    import frontmatter
+
     sections = []
 
-    # Remove HTML tags first
-    content = re.sub(r"<[^>]+>", "", md_content)
-    # Remove markdown images
-    content = re.sub(r"!\[.*?\]\(.*?\)", "", content)
-    # Remove markdown links but keep text
-    content = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", content)
+    # Parse frontmatter
+    try:
+        post = frontmatter.loads(md_content)
+        metadata = post.metadata
+        content = post.content
 
+        # Get title and description from frontmatter
+        doc_title = metadata.get('title', 'Overview')
+        doc_description = metadata.get('description', '')
+
+        # If we have a clean description in frontmatter, use it as first section
+        if doc_description:
+            clean_desc = re.sub(r'\s+', ' ', doc_description).strip()
+            sections.append({
+                'header': doc_title,
+                'content': clean_desc[:500]
+            })
+    except:
+        # No frontmatter, use full content
+        content = md_content
+        doc_title = None
+
+    # Clean the content
+    content = re.sub(r"<[^>]+>", "", content)  # Remove HTML tags
+    content = re.sub(r"!\[.*?\]\(.*?\)", "", content)  # Remove images
+    content = re.sub(r"\[(.*?)\]\(.*?\)", r"\1", content)  # Keep link text only
+
+    # Extract sections by headers
     lines = content.split('\n')
     current_header = None
     current_content = []
 
     for line in lines:
-        # Check if line is a header (# or ## or ###)
+        # Check for markdown headers
         header_match = re.match(r'^#{1,3}\s+(.+)$', line)
         if header_match:
             # Save previous section
             if current_content:
                 text = ' '.join(current_content).strip()
-                text = re.sub(r'\s+', ' ', text)  # Clean whitespace
-                if text and len(text) > 20:  # Only keep substantial content
+                text = re.sub(r'\s+', ' ', text)
+                # Skip lines with just metadata markers
+                text = re.sub(r'^[-*]+\s*$', '', text)
+                if text and len(text) > 20:
                     sections.append({
-                        'header': current_header or 'Overview',
-                        'content': text[:500]  # Limit to 500 chars
+                        'header': current_header or doc_title or 'Overview',
+                        'content': text[:500]
                     })
             # Start new section
             current_header = header_match.group(1).strip()
             current_content = []
         else:
-            if line.strip():
+            # Skip metadata-looking lines
+            if line.strip() and not re.match(r'^[-*]{3,}', line):
                 current_content.append(line.strip())
 
     # Add last section
@@ -89,11 +115,20 @@ def extract_sections_from_markdown(md_content):
         text = re.sub(r'\s+', ' ', text)
         if text and len(text) > 20:
             sections.append({
-                'header': current_header or 'Overview',
+                'header': current_header or doc_title or 'Overview',
                 'content': text[:500]
             })
 
-    return sections if sections else [{'header': 'Content', 'content': content[:500]}]
+    # If no sections found, create one from content
+    if not sections:
+        clean_content = re.sub(r'\s+', ' ', content).strip()
+        if clean_content:
+            sections.append({
+                'header': doc_title or 'Content',
+                'content': clean_content[:500]
+            })
+
+    return sections
 
 def chunk_text(text, chunk_size=500):
     """Fallback chunking if section extraction fails"""

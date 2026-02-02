@@ -129,7 +129,7 @@ deployments:
     deploymentType: Service
     resources:
       cpu: 200
-      memory: 500
+      memory: 15600
       replicas: 1
   - name: ingestion-api
     application: ingestion-api

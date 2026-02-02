@@ -2,5 +2,6 @@ FROM node:21-bookworm-slim
 COPY . /app
 WORKDIR /app
 RUN npm install
-ENTRYPOINT node main.js
+RUN npm run build
+ENTRYPOINT ["node", "dist/main"]
 

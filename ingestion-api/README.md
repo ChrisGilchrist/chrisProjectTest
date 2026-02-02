@@ -1,34 +1,85 @@
-# Sample template
+# Quix Search API
 
-[This code sample](https://github.com/quixio/quix-samples/tree/main/nodejs/empty) is a template for an [express](https://expressjs.com/) web application that can be hosted on the Quix platform.
+A NestJS-based semantic search API for Quix documentation using Qdrant vector database and Transformers.js for embeddings.
 
-## How to run
+## Features
 
-Create a [Quix](https://portal.cloud.quix.io/signup?utm_campaign=github) account or log-in and visit the Samples to use this project.
+- 🔍 Semantic search endpoint `/search?q=<query>`
+- 🧠 Uses MiniLM embeddings for fast, accurate results
+- 📊 Returns ranked results with title, snippet, URL, and score
+- 🚀 Built with NestJS for production-ready architecture
+- ⚡ Transformers.js for efficient embeddings in Node.js
+- 🌐 CORS enabled for frontend integration
 
-Clicking `Deploy` on the Sample, deploys a pre-built container in Quix. Complete the environment variables to configure the container.
+## Setup
 
-Clicking `Edit code` on the Sample, forks the project to your own Git repo so you can customize it before deploying.
+### 1. Install dependencies
 
-## Environment variables
+```bash
+npm install
+```
 
-This code sample uses the following environment variables:
+### 2. Configure environment
 
-- **VariableName**: {Description of the variable}
-- **input**: {Description of the variable}
-- **output**: {Description of the variable}
+The `.env` file contains the configuration:
 
-## Requirements/prerequisites (optional)
+```env
+QDRANT_URL=https://qdrant-qdrant-v1-8-3-quixdev-chrisprojecttest-env1.deployments-dev.quix.io
+QDRANT_COLLECTION=quix_docs
+MODEL_NAME=Xenova/all-MiniLM-L6-v2
+PORT=3000
+```
 
-{This will contain any external resource needed to run this sample and the instructions to get them.}
+### 3. Start the API
 
-## Contribute
+```bash
+# Development mode with hot reload
+npm run start:dev
 
-Submit forked projects to the Quix [GitHub](https://github.com/quixio/quix-samples) repo. Any new project that we accept will be attributed to you and you'll receive $200 in Quix credit.
+# Production mode
+npm run build
+npm run start:prod
+```
 
-## Open source
+## API Endpoints
 
-This project is open source under the Apache 2.0 license and available in our [GitHub](https://github.com/quixio/quix-samples) repo.
+### Search Documentation
 
-Please star us and mention us on social to show your appreciation.
+```
+GET /search?q=<query>&limit=<number>
+```
 
+**Parameters:**
+- `q` (required): Search query string
+- `limit` (optional): Number of results to return (1-20, default: 5)
+
+**Example:**
+
+```bash
+curl "http://localhost:3000/search?q=streams&limit=10"
+```
+
+**Response:**
+
+```json
+{
+  "query": "streams",
+  "count": 5,
+  "results": [
+    {
+      "title": "Streams Overview",
+      "snippet": "Streams are the core abstraction in Quix for handling real-time data...",
+      "url": "https://docs.quix.io/streams/overview.md",
+      "score": 0.9123
+    }
+  ]
+}
+```
+
+### Health Check
+
+```
+GET /search/health
+```
+
+Returns the API health status.

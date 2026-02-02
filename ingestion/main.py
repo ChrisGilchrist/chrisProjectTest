@@ -32,7 +32,7 @@ DOCS_ROOT = os.environ.get("DOCS_ROOT", DEFAULT_DOCS_ROOT)
 COLLECTION = os.environ.get("QDRANT_COLLECTION", "quix_docs")
 QDRANT_URL = os.environ.get(
     "QDRANT_URL",
-    "https://qdrant-qdrant-v1-8-3-quixdev-chrisprojecttest-env1.deployments-dev.quix.io"
+    "http://qdrant:6333"
 )
 MODEL_NAME = os.environ.get("MODEL_NAME", "sentence-transformers/all-MiniLM-L6-v2")
 

@@ -108,9 +108,8 @@ deployments:
         description: Name of the output topic to write into
         required: true
         value: f1-data
-  - name: ingestion
-    application: ingestion
-    version: latest
+  - name: Qdrant
+    image: qdrant/qdrant:v1.8.3
     deploymentType: Service
     resources:
       cpu: 200

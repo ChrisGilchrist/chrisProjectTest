@@ -90,15 +90,37 @@ def main():
         log.info("📦 Importing dependencies")
         from sentence_transformers import SentenceTransformer
         from qdrant_client import QdrantClient
-        from qdrant_client.models import PointStruct
+        from qdrant_client.models import PointStruct, Distance, VectorParams
 
         log.info(f"🧠 Loading embedding model: {MODEL_NAME}")
         model = SentenceTransformer(MODEL_NAME)
         log.info("✅ Model loaded")
 
         log.info(f"🔌 Connecting to Qdrant at {QDRANT_URL}")
-        client = QdrantClient(url=QDRANT_URL, timeout=30)
+        client = QdrantClient(url=QDRANT_URL, timeout=180)
         log.info("✅ Connected to Qdrant")
+
+        # Check/create collection
+        try:
+            collections = client.get_collections()
+            collection_names = [c.name for c in collections.collections]
+            log.info(f"📚 Qdrant has {len(collection_names)} collections")
+
+            if COLLECTION not in collection_names:
+                log.info(f"📦 Creating collection: {COLLECTION}")
+                client.create_collection(
+                    collection_name=COLLECTION,
+                    vectors_config=VectorParams(
+                        size=384,  # MiniLM-L6-v2 embedding dimension
+                        distance=Distance.COSINE
+                    )
+                )
+                log.info(f"✅ Collection {COLLECTION} created")
+            else:
+                log.info(f"✅ Collection {COLLECTION} exists")
+        except Exception as e:
+            log.error(f"❌ Collection check/creation failed: {e}")
+            raise
 
         log.info(f"📂 Scanning docs in {DOCS_ROOT}")
         md_files = find_markdown_files(DOCS_ROOT)
@@ -141,12 +163,26 @@ def main():
                     )
                 )
 
-            # Batch upsert if needed (optional)
-            batch_size = 64
+            # Batch upsert with retry logic
+            batch_size = 16
             for i in range(0, len(points), batch_size):
                 batch = points[i:i+batch_size]
-                client.upsert(collection_name=COLLECTION, points=batch)
-                log.info(f"✅ Upserted batch {i//batch_size+1}/{(len(points)-1)//batch_size+1}")
+
+                # Retry upsert with exponential backoff
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        client.upsert(collection_name=COLLECTION, points=batch)
+                        log.info(f"✅ Upserted batch {i//batch_size+1}/{(len(points)-1)//batch_size+1}")
+                        break
+                    except Exception as e:
+                        if attempt < max_retries - 1:
+                            wait_time = 2 ** attempt
+                            log.warning(f"⚠️  Upsert failed (attempt {attempt+1}/{max_retries}), retrying in {wait_time}s... Error: {e}")
+                            time.sleep(wait_time)
+                        else:
+                            log.error(f"❌ Upsert failed after {max_retries} attempts")
+                            raise
 
         log.info("🎉 Ingestion complete")
 

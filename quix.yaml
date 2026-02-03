@@ -121,9 +121,6 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: qdrant-qdrant-v1-8-3
-    state:
-      enabled: true
-      size: 3
     network:
       serviceName: qdrant
       ports:

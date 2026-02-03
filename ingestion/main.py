@@ -236,6 +236,15 @@ def main():
             log.info(f"➡️ Processing {idx+1}/{len(md_files)}: {md_file}")
 
             raw_md = read_markdown(md_file)
+
+            # Parse frontmatter to extract metadata
+            import frontmatter
+            try:
+                post = frontmatter.loads(raw_md)
+                metadata = post.metadata
+            except:
+                metadata = {}
+
             sections = extract_sections_from_markdown(raw_md)
 
             log.info(f"✂️ {len(sections)} sections created")
@@ -259,18 +268,31 @@ def main():
                 raise
 
             log.info(f"📦 Building {len(sections)} point structures...")
+
+            # Get document title from metadata or filename
+            doc_title = metadata.get('title', md_file.stem.replace('-', ' ').title())
+
             points = []
             for i, section in enumerate(sections):
+                # Use document title as primary title
+                # Only append section header if it's different from doc title
+                section_header = section['header']
+                if section_header and section_header != doc_title:
+                    display_title = f"{doc_title}: {section_header}"
+                else:
+                    display_title = doc_title
+
                 points.append(
                     PointStruct(
                         id=str(uuid.uuid4()),
                         vector=vectors[i].tolist(),
                         payload={
-                            "title": section['header'],
+                            "title": display_title,
                             "text": section['content'],
                             "source_path": str(md_file),
-                            "url": build_docs_url(md_file),
-                            "page_title": md_file.stem,
+                            "url": build_docs_url(md_file, metadata),
+                            "page_title": doc_title,
+                            "section": section_header,
                         }
                     )
                 )

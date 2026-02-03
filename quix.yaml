@@ -60,6 +60,9 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: basicangularapp-38dc9ea
+    state:
+      enabled: true
+      size: 5
     variables:
       - name: input
         inputType: InputTopic

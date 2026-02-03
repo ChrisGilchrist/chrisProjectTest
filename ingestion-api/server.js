@@ -37,11 +37,38 @@ async function embed(text) {
   return Array.from(output.data);
 }
 
-// Truncate text
-function truncateText(text, maxLength) {
+// Clean markdown syntax from text
+function cleanMarkdown(text) {
   if (!text) return '';
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
+  return text
+    .replace(/\|[^|]+\|/g, '')              // Remove table syntax
+    .replace(/\*\*(.+?)\*\*/g, '$1')        // Remove bold
+    .replace(/\*(.+?)\*/g, '$1')            // Remove italic
+    .replace(/`(.+?)`/g, '$1')              // Remove code marks
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep link text only
+    .replace(/\s+/g, ' ')                   // Normalize whitespace
+    .trim();
+}
+
+// Smart truncation at sentence boundaries
+function smartTruncate(text, maxLength) {
+  if (!text || text.length <= maxLength) return text;
+
+  // Find last sentence boundary before maxLength
+  const truncated = text.slice(0, maxLength);
+  const lastPeriod = truncated.lastIndexOf('. ');
+  const lastQuestion = truncated.lastIndexOf('? ');
+  const lastExclamation = truncated.lastIndexOf('! ');
+  const boundary = Math.max(lastPeriod, lastQuestion, lastExclamation);
+
+  // Use sentence boundary if it's not too far back (within 70% of maxLength)
+  if (boundary > maxLength * 0.7) {
+    return text.slice(0, boundary + 1);
+  }
+
+  // Fallback: cut at last space to avoid mid-word truncation
+  const lastSpace = truncated.lastIndexOf(' ');
+  return lastSpace > 0 ? text.slice(0, lastSpace) + '...' : text.slice(0, maxLength) + '...';
 }
 
 // Enable CORS
@@ -95,11 +122,14 @@ app.get('/search', async (req, res) => {
 
     console.log(`✅ Found ${results.length} results`);
 
-    // Format results
+    // Format results (Supabase-compatible format)
     const formattedResults = results.map(r => ({
       title: r.payload?.title || 'Untitled',
-      snippet: truncateText(r.payload?.text, 200),
+      subtitle: r.payload?.subtitle || null,
+      description: r.payload?.description || smartTruncate(cleanMarkdown(r.payload?.text), 200),
       url: r.payload?.url || '',
+      heading: r.payload?.heading || null,
+      slug: r.payload?.slug || null,
       score: r.score,
     }));
 

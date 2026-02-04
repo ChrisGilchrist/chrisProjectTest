@@ -195,6 +195,7 @@ deployments:
       replicas: 1
     configuration:
       topic: first_topic
+      indexRowCount: 1000222
 
 # This section describes the Topics of the data pipeline
 topics:

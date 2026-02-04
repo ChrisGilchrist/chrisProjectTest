@@ -11,6 +11,10 @@ variables:
     multiline: false
     description: Name of the output topic to write to.
     defaultValue: output-topic
+  - name: FreeText
+    inputType: FreeText
+    multiline: false
+    defaultValue: FreeText value
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

@@ -31,6 +31,11 @@ variables:
     inputType: Secret
     multiline: false
     defaultValue: ADMIN_PASSWORD
+  - name: k
+    inputType: FreeText
+    multiline: false
+    description: k
+    defaultValue: kk
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

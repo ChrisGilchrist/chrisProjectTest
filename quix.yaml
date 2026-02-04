@@ -139,21 +139,13 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: ingestion-api-c7f9695
+    state:
+      enabled: true
+      size: 1
     network:
       ports:
         - port: 80
           targetPort: 3000
-    variables:
-      - name: input
-        inputType: InputTopic
-        description: This is the input topic to read data from
-        required: true
-        value: first_topic
-      - name: output
-        inputType: OutputTopic
-        description: This is the output topic to write data to
-        required: true
-        value: output-topic
   - name: VariableTesting
     application: variabletesting
     version: latest

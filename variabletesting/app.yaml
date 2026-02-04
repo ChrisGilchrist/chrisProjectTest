@@ -23,10 +23,10 @@ variables:
   - name: Options
     inputType: Options
     multiline: false
-    defaultValue: helloooooooooo
+    defaultValue: hellooooo
     options:
       - label: hellooooo
-        value: helloooooooooo
+        value: hellooooo
   - name: secret
     inputType: Secret
     multiline: false

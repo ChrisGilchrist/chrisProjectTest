@@ -150,6 +150,37 @@ deployments:
         description: This is the output topic to write data to
         required: true
         value: output-topic
+  - name: VariableTesting
+    application: variabletesting
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        value: input_topic
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
+        value: output-topic
+      - name: FreeText
+        inputType: FreeText
+        value: FreeText value
+      - name: MultiLine
+        inputType: FreeText
+        multiline: true
+        value: |
+          MultiLine value
+      - name: Options
+        inputType: Options
+        value: optionValue
+      - name: secret
+        inputType: Secret
+        secretKey: ADMIN_PASSWORD
 
 # This section describes the Topics of the data pipeline
 topics:

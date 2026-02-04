@@ -185,6 +185,16 @@ deployments:
         inputType: FreeText
         description: k
         value: kk
+  - name: Quix DataLake Sink
+    application: DataLake.Sink
+    version: latest
+    deploymentType: Managed
+    resources:
+      cpu: 500
+      memory: 1500
+      replicas: 1
+    configuration:
+      topic: first_topic
 
 # This section describes the Topics of the data pipeline
 topics:

@@ -177,10 +177,14 @@ deployments:
           MultiLine value
       - name: Options
         inputType: Options
-        value: optionValue
+        value: helloooooooooo
       - name: secret
         inputType: Secret
         secretKey: ADMIN_PASSWORD
+      - name: k
+        inputType: FreeText
+        description: k
+        value: kk
 
 # This section describes the Topics of the data pipeline
 topics:

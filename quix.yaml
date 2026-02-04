@@ -38,7 +38,7 @@ deployments:
         default: true
       sidebarItem:
         show: true
-        label: Frontend123466
+        label: Fron
         icon: save
         order: 2
       globalItem:

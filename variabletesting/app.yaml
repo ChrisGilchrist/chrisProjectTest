@@ -8,8 +8,9 @@ variables:
     defaultValue: input_topic
   - name: output
     inputType: OutputTopic
+    multiline: false
     description: Name of the output topic to write to.
-    defaultValue: transform
+    defaultValue: output-topic
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

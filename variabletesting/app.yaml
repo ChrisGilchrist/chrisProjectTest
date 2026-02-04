@@ -15,6 +15,11 @@ variables:
     inputType: FreeText
     multiline: false
     defaultValue: FreeText value
+  - name: MultiLine
+    inputType: FreeText
+    multiline: true
+    defaultValue: |
+      MultiLine value
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

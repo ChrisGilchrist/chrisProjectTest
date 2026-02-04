@@ -157,6 +157,7 @@ deployments:
     state:
       enabled: true
       size: 1
+      path: /app/state/patrick
     variables:
       - name: input
         inputType: InputTopic

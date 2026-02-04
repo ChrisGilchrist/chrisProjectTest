@@ -36,6 +36,7 @@ deployments:
       embeddedView:
         enabled: true
         hideHeader: true
+        default: true
       sidebarItem:
         show: true
         label: Fron

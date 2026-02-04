@@ -24,7 +24,7 @@ deployments:
   - name: ProjectOne
     application: projectone
     version: latest
-    deploymentType: Job
+    deploymentType: Service
     resources:
       cpu: 200
       memory: 500

@@ -35,7 +35,7 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        default: true
+        hideHeader: true
       sidebarItem:
         show: true
         label: Fron

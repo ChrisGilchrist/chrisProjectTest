@@ -29,6 +29,8 @@ deployments:
       cpu: 200
       memory: 500
       replicas: 1
+    network:
+      publicAccess: true
     plugin:
       embeddedView:
         enabled: true

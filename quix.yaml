@@ -187,7 +187,7 @@ deployments:
         value: kk
   - name: Quix DataLake Sink
     application: DataLake.Sink
-    version: 20251021.4-scape-characters-for-weird-keys-2
+    version: latest
     deploymentType: Managed
     resources:
       cpu: 500

@@ -20,6 +20,13 @@ variables:
     multiline: true
     defaultValue: |
       MultiLine value
+  - name: Options
+    inputType: Options
+    multiline: false
+    defaultValue: optionValue
+    options:
+      - label: optionValue
+        value: optionValue
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

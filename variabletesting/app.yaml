@@ -37,7 +37,8 @@ variables:
   - name: secret
     inputType: Secret
     multiline: false
-    defaultValue: INFLUX_ADMIN_TOKEN
+    description: kkk
+    defaultValue: INFLUXDB_ADMIN_TOKEN
   - name: k
     inputType: FreeText
     multiline: false

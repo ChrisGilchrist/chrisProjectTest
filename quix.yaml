@@ -205,3 +205,4 @@ topics:
   - name: output-topic
   - name: f1-data
   - name: input_topic
+  - name: f1-data-2

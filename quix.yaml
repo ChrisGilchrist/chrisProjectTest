@@ -177,7 +177,7 @@ deployments:
           MultiLine value
       - name: Options
         inputType: Options
-        value: helloooooooooo
+        value: Different222
       - name: secret
         inputType: Secret
         secretKey: ADMIN_PASSWORD

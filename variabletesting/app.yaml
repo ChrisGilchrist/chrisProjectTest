@@ -39,6 +39,7 @@ variables:
     multiline: false
     description: kkk
     defaultValue: INFLUXDB_ADMIN_TOKEN
+    required: true
   - name: k
     inputType: FreeText
     multiline: false

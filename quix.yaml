@@ -224,7 +224,7 @@ deployments:
       - name: Options
         inputType: Options
         description: jjj
-        value: Patrick222
+        value: hellooooo
       - name: secret
         inputType: Secret
         description: kkk

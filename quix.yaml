@@ -224,10 +224,12 @@ deployments:
       - name: Options
         inputType: Options
         description: jjj
-        value: Different222
+        value: Patrick222
       - name: secret
         inputType: Secret
-        secretKey: ADMIN_PASSWORD
+        description: kkk
+        required: true
+        secretKey: kkkk
       - name: k
         inputType: FreeText
         description: k

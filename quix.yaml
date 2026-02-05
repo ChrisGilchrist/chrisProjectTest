@@ -232,6 +232,42 @@ deployments:
         inputType: FreeText
         description: k
         value: kk
+  - name: VariableTesting 3
+    application: variabletesting
+    version: d43524740c92aee2e8edaf9bd8481c571f4e253d
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        value: input_topic
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
+        value: output-topic
+      - name: FreeText
+        inputType: FreeText
+        value: FreeText value
+      - name: MultiLine
+        inputType: FreeText
+        multiline: true
+        value: |
+          MultiLine value
+      - name: Options
+        inputType: Options
+        description: jjj
+        value: Different222
+      - name: secret
+        inputType: Secret
+        secretKey: ADMIN_PASSWORD
+      - name: k
+        inputType: FreeText
+        description: k
+        value: kk
 
 # This section describes the Topics of the data pipeline
 topics:

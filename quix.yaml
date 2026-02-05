@@ -162,11 +162,11 @@ deployments:
       - name: input
         inputType: InputTopic
         description: Name of the input topic to listen to.
-        value: input_topic
+        value: ''
       - name: output
         inputType: OutputTopic
         description: Name of the output topic to write to.
-        value: output-topic
+        value: f1-data-2
       - name: FreeText
         inputType: FreeText
         value: FreeText value
@@ -177,7 +177,7 @@ deployments:
           MultiLine value
       - name: Options
         inputType: Options
-        value: Different222
+        value: hellooooo
       - name: secret
         inputType: Secret
         secretKey: ADMIN_PASSWORD

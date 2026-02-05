@@ -23,6 +23,7 @@ variables:
   - name: Options
     inputType: Options
     multiline: false
+    description: jjj
     defaultValue: Different222
     options:
       - label: hellooooo

@@ -6,3 +6,5 @@
       C-->D;
 ```
 😭
+
+![My icon](./demo-image.png)

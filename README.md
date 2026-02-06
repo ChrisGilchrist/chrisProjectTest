@@ -7,4 +7,4 @@
 ```
 😭
 
-![My icon](./demo-image.png)
+![My icon](demo-image.png)

@@ -1,0 +1,6 @@
+name: Quix Pipeline Monitor
+language: nodejs
+variables: []
+dockerfile: dockerfile
+runEntryPoint: main.js
+defaultFile: main.js

@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quix Pipeline Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --bg: #0A0C0F;
+    --matrix: #00FF41;
+    --teal: #00D2BE;
+    --purple: #9B59B6;
+    --amber: #FF9500;
+    --error: #FF2D2D;
+    --panel: #0D1117;
+    --border: #1C2128;
+    --text-dim: #4A5568;
+    --text-mid: #718096;
+    --font: 'JetBrains Mono', monospace;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--matrix);
+    font-family: var(--font);
+  }
+
+  #app {
+    display: grid;
+    grid-template-rows: 64px 1fr 100px;
+    grid-template-columns: 1fr 280px;
+    grid-template-areas:
+      "header header"
+      "canvas sidebar"
+      "log    log";
+    width: 100vw;
+    height: 100vh;
+    gap: 0;
+  }
+
+  /* ── HEADER ── */
+  #header {
+    grid-area: header;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 32px;
+    flex-shrink: 0;
+  }
+
+  .brand-logo {
+    width: 28px;
+    height: 28px;
+    position: relative;
+  }
+
+  .brand-logo svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .brand-name {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--matrix);
+    text-transform: uppercase;
+  }
+
+  .brand-sub {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  .metrics-strip {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    height: 100%;
+  }
+
+  .metric-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 28px;
+    height: 100%;
+    border-left: 1px solid var(--border);
+    min-width: 130px;
+  }
+
+  .metric-label {
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .metric-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--matrix);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .metric-value.throughput {
+    font-size: 22px;
+  }
+
+  .metric-value.uptime {
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  .metric-value.alerts-ok { color: var(--matrix); }
+  .metric-value.alerts-warn { color: var(--amber); }
+  .metric-value.alerts-error { color: var(--error); }
+
+  .metric-unit {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-left: 4px;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--matrix);
+    margin-right: 6px;
+    box-shadow: 0 0 6px var(--matrix);
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--matrix); }
+    50% { opacity: 0.5; box-shadow: 0 0 2px var(--matrix); }
+  }
+
+  /* ── CANVAS ── */
+  #canvas {
+    grid-area: canvas;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+
+  #pipeline-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    grid-area: sidebar;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-header::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: var(--matrix);
+    border-radius: 50%;
+  }
+
+  .topic-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .topic-card {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+    transition: background 0.15s;
+  }
+
+  .topic-card:hover {
+    background: rgba(0, 255, 65, 0.03);
+  }
+
+  .topic-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--matrix);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .topic-name::before {
+    content: '▶';
+    font-size: 8px;
+    opacity: 0.6;
+  }
+
+  .topic-sparkline-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .topic-sparkline {
+    flex-shrink: 0;
+  }
+
+  .topic-rate {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--matrix);
+    line-height: 1;
+  }
+
+  .topic-rate-unit {
+    font-size: 8px;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 1px;
+  }
+
+  .lag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lag-label {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    width: 28px;
+    flex-shrink: 0;
+  }
+
+  .lag-bar-track {
+    flex: 1;
+    height: 4px;
+    background: #1a1f2e;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .lag-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease, background 0.5s ease;
+  }
+
+  .lag-value {
+    font-size: 9px;
+    color: var(--text-mid);
+    width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── LOG ── */
+  #log {
+    grid-area: log;
+    background: #080A0D;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .log-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .log-header-label {
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .log-header-blink {
+    width: 6px;
+    height: 6px;
+    background: var(--matrix);
+    border-radius: 50%;
+    animation: blink 1s step-end infinite;
+    box-shadow: 0 0 4px var(--matrix);
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  #log-entries {
+    flex: 1;
+    overflow: hidden;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .log-entry {
+    padding: 2px 16px;
+    font-size: 10.5px;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    animation: fadeIn 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .log-entry.info { color: var(--matrix); }
+  .log-entry.warn { color: var(--amber); }
+  .log-entry.error { color: var(--error); }
+
+  .log-ts { color: var(--text-dim); margin-right: 4px; }
+  .log-level { font-weight: 700; display: inline-block; width: 44px; }
+  .log-topic { display: inline-block; width: 120px; color: #8892A4; }
+  .log-msg { }
+
+  /* ── NODE POPUP ── */
+  #node-popup {
+    position: fixed;
+    background: #0D1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    width: 280px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,65,0.1);
+    animation: popupIn 0.15s ease;
+  }
+
+  @keyframes popupIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .popup-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .popup-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+
+  .popup-type-badge {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-top: 4px;
+    display: inline-block;
+    font-weight: 600;
+  }
+
+  .badge-source { background: rgba(0,210,190,0.15); color: var(--teal); border: 1px solid rgba(0,210,190,0.3); }
+  .badge-topic { background: rgba(0,255,65,0.1); color: var(--matrix); border: 1px solid rgba(0,255,65,0.2); }
+  .badge-processor { background: rgba(155,89,182,0.15); color: var(--purple); border: 1px solid rgba(155,89,182,0.3); }
+  .badge-sink { background: rgba(255,149,0,0.12); color: var(--amber); border: 1px solid rgba(255,149,0,0.25); }
+
+  .popup-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .popup-close:hover {
+    border-color: var(--error);
+    color: var(--error);
+  }
+
+  .popup-status-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-pill {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .status-running { background: rgba(0,255,65,0.1); color: var(--matrix); border: 1px solid rgba(0,255,65,0.3); }
+  .status-degraded { background: rgba(255,149,0,0.1); color: var(--amber); border: 1px solid rgba(255,149,0,0.3); }
+  .status-error { background: rgba(255,45,45,0.1); color: var(--error); border: 1px solid rgba(255,45,45,0.3); }
+
+  .popup-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .popup-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .popup-metric-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .popup-metric-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .popup-metric-unit {
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  .popup-ai-section {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: none;
+  }
+
+  .popup-ai-label {
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    color: var(--purple);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .popup-ai-detail {
+    font-size: 10px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+
+  .popup-ai-detail strong {
+    color: #c084fc;
+  }
+
+  /* ── SVG NODE STYLES ── */
+  .node-rect {
+    rx: 8;
+    ry: 8;
+    cursor: pointer;
+    transition: filter 0.2s;
+  }
+
+  .node-group:hover .node-rect {
+    filter: brightness(1.3);
+  }
+
+  .node-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+  }
+
+  .node-group {
+    cursor: pointer;
+  }
+
+  .node-group.heartbeat rect,
+  .node-group.heartbeat ellipse,
+  .node-group.heartbeat polygon {
+    filter: drop-shadow(0 0 12px #ffffff) !important;
+  }
+
+  .conn-path {
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 0.35;
+  }
+
+  .scan-line {
+    animation: scan 8s linear infinite;
+  }
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(200%); }
+  }
+
+  /* Grid pattern overlay */
+  #canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #pipeline-svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Sentiment AI special node */
+  .sentiment-glow {
+    animation: sentiment-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes sentiment-pulse {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(155,89,182,0.8)); }
+    50% { filter: drop-shadow(0 0 20px rgba(155,89,182,1)); }
+  }
+
+  .ai-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    font-weight: 800;
+    fill: #fff;
+    letter-spacing: 0.05em;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 28 28" fill="none">
+          <polygon points="14,2 26,9 26,19 14,26 2,19 2,9" fill="none" stroke="#00FF41" stroke-width="1.5"/>
+          <polygon points="14,7 21,11 21,17 14,21 7,17 7,11" fill="rgba(0,255,65,0.1)" stroke="#00FF41" stroke-width="1"/>
+          <circle cx="14" cy="14" r="3" fill="#00FF41"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Quix</div>
+        <div class="brand-sub">Pipeline Monitor</div>
+      </div>
+    </div>
+
+    <div class="metrics-strip">
+      <div class="metric-cell">
+        <div class="metric-label">Total Throughput</div>
+        <div class="metric-value throughput"><span class="status-dot"></span><span id="m-throughput">14,823</span><span class="metric-unit">msg/s</span></div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Producers</div>
+        <div class="metric-value" id="m-producers">4</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Consumers</div>
+        <div class="metric-value" id="m-consumers">8</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Topics</div>
+        <div class="metric-value" id="m-topics">4</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Uptime</div>
+        <div class="metric-value uptime" id="m-uptime">14d 07h 23m 41s</div>
+      </div>
+      <div class="metric-cell">
+        <div class="metric-label">Alerts</div>
+        <div class="metric-value alerts-ok" id="m-alerts">0</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PIPELINE CANVAS -->
+  <main id="canvas">
+    <svg id="pipeline-svg" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <!-- Teal gradient for sources -->
+        <linearGradient id="grad-source" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#00D2BE" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#005B55" stop-opacity="0.15"/>
+        </linearGradient>
+        <!-- Green gradient for topics -->
+        <linearGradient id="grad-topic" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#00FF41" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#004D14" stop-opacity="0.1"/>
+        </linearGradient>
+        <!-- Purple gradient for processors -->
+        <linearGradient id="grad-processor" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#9B59B6" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#4A1060" stop-opacity="0.15"/>
+        </linearGradient>
+        <!-- Amber gradient for sinks -->
+        <linearGradient id="grad-sink" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FF9500" stop-opacity="0.25"/>
+          <stop offset="100%" stop-color="#7A4600" stop-opacity="0.1"/>
+        </linearGradient>
+        <!-- Glow filters -->
+        <filter id="glow-teal" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-green" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-purple" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-amber" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-white" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="6" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-particle" x="-200%" y="-200%" width="500%" height="500%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <!-- Scan line gradient -->
+        <linearGradient id="scan-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(0,255,65,0)" />
+          <stop offset="50%" stop-color="rgba(0,255,65,0.04)" />
+          <stop offset="100%" stop-color="rgba(0,255,65,0)" />
+        </linearGradient>
+      </defs>
+
+      <!-- Scan line effect -->
+      <rect class="scan-line" x="0" y="-200" width="1000" height="120" fill="url(#scan-grad)" pointer-events="none"/>
+
+      <!-- Column labels -->
+      <text x="110" y="22" font-family="JetBrains Mono" font-size="8" fill="#2A3545" letter-spacing="3" text-anchor="middle" font-weight="600">SOURCES</text>
+      <text x="330" y="22" font-family="JetBrains Mono" font-size="8" fill="#2A3545" letter-spacing="3" text-anchor="middle" font-weight="600">TOPICS</text>
+      <text x="570" y="22" font-family="JetBrains Mono" font-size="8" fill="#2A3545" letter-spacing="3" text-anchor="middle" font-weight="600">PROCESSORS</text>
+      <text x="810" y="22" font-family="JetBrains Mono" font-size="8" fill="#2A3545" letter-spacing="3" text-anchor="middle" font-weight="600">SINKS</text>
+
+      <!-- Column dividers -->
+      <line x1="215" y1="30" x2="215" y2="540" stroke="#1C2128" stroke-width="1" stroke-dasharray="3,6"/>
+      <line x1="445" y1="30" x2="445" y2="540" stroke="#1C2128" stroke-width="1" stroke-dasharray="3,6"/>
+      <line x1="685" y1="30" x2="685" y2="540" stroke="#1C2128" stroke-width="1" stroke-dasharray="3,6"/>
+
+      <!-- CONNECTION PATHS (drawn first, behind nodes) -->
+      <g id="connections"></g>
+
+      <!-- PARTICLES LAYER -->
+      <g id="particles"></g>
+
+      <!-- NODES LAYER -->
+      <g id="nodes"></g>
+
+    </svg>
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-header">Topic Health</div>
+    <div class="topic-cards" id="topic-cards"></div>
+  </aside>
+
+  <!-- EVENT LOG -->
+  <footer id="log">
+    <div class="log-header">
+      <div class="log-header-blink"></div>
+      <span class="log-header-label">Event Stream</span>
+    </div>
+    <div id="log-entries"></div>
+  </footer>
+
+</div>
+
+<!-- NODE POPUP -->
+<div id="node-popup">
+  <div class="popup-header">
+    <div>
+      <div class="popup-title" id="popup-name">Node Name</div>
+      <span class="popup-type-badge" id="popup-badge">Source</span>
+    </div>
+    <button class="popup-close" id="popup-close">✕</button>
+  </div>
+  <div class="popup-status-row">
+    <div class="status-pill status-running" id="popup-status">RUNNING</div>
+  </div>
+  <div class="popup-metrics">
+    <div class="popup-metric">
+      <span class="popup-metric-label">Msgs/s In</span>
+      <span class="popup-metric-value" id="popup-in">—</span>
+      <span class="popup-metric-unit">msg/s</span>
+    </div>
+    <div class="popup-metric">
+      <span class="popup-metric-label">Msgs/s Out</span>
+      <span class="popup-metric-value" id="popup-out">—</span>
+      <span class="popup-metric-unit">msg/s</span>
+    </div>
+    <div class="popup-metric">
+      <span class="popup-metric-label">Latency</span>
+      <span class="popup-metric-value" id="popup-latency">—</span>
+      <span class="popup-metric-unit">ms</span>
+    </div>
+    <div class="popup-metric">
+      <span class="popup-metric-label">Consumer Lag</span>
+      <span class="popup-metric-value" id="popup-lag">—</span>
+      <span class="popup-metric-unit">ms</span>
+    </div>
+  </div>
+  <div class="popup-ai-section" id="popup-ai-section">
+    <div class="popup-ai-label">Neural Engine</div>
+    <div class="popup-ai-detail">
+      <strong>Model:</strong> quix-sentiment-v2<br>
+      <strong>Inference:</strong> <span id="popup-ai-infer">4</span>ms avg<br>
+      <strong>Batch size:</strong> 64<br>
+      <strong>Throughput:</strong> 16,000 infer/s
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const state = {
+  totalMsgSec: 14823,
+  uptimeStart: Date.now() - (14 * 86400 + 7 * 3600 + 23 * 60 + 41) * 1000,
+  alertCount: 0,
+  topics: {
+    'f1-data':       { msgSec: 4241, lag: 12,  history: [], color: '#00D2BE' },
+    'iot-raw':       { msgSec: 2817, lag: 38,  history: [], color: '#00FF41' },
+    'social-stream': { msgSec: 5934, lag: 8,   history: [], color: '#9B59B6' },
+    'opc-telemetry': { msgSec: 1831, lag: 142, history: [], color: '#FF9500' }
+  },
+  nodeStatuses: {},
+  particles: [],
+  lastParticleTime: 0
+};
+
+// Initialise sparkline history
+Object.keys(state.topics).forEach(k => {
+  const t = state.topics[k];
+  for (let i = 0; i < 30; i++) {
+    t.history.push(t.msgSec * (0.7 + Math.random() * 0.6));
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+// LAYOUT DATA
+// ═══════════════════════════════════════════════════════════
+const NODE_W = 130;
+const NODE_H = 40;
+
+// Positions in SVG viewBox 0 0 1000 560
+// Column centres: 110, 330, 570, 810
+const nodes = {
+  // Sources (col 1, cx=110)
+  'f1-sensor':    { x: 45,  y: 80,  w: NODE_W, h: NODE_H, label: 'F1 Sensor Feed', type: 'source', color: '#00D2BE', fill: 'url(#grad-source)', stroke: '#00D2BE', filter: 'glow-teal' },
+  'iot-fleet':    { x: 45,  y: 190, w: NODE_W, h: NODE_H, label: 'IoT Fleet',       type: 'source', color: '#00D2BE', fill: 'url(#grad-source)', stroke: '#00D2BE', filter: 'glow-teal' },
+  'social-api':   { x: 45,  y: 300, w: NODE_W, h: NODE_H, label: 'Social API',      type: 'source', color: '#00D2BE', fill: 'url(#grad-source)', stroke: '#00D2BE', filter: 'glow-teal' },
+  'opc-ua':       { x: 45,  y: 410, w: NODE_W, h: NODE_H, label: 'OPC-UA Server',   type: 'source', color: '#00D2BE', fill: 'url(#grad-source)', stroke: '#00D2BE', filter: 'glow-teal' },
+
+  // Topics (col 2, cx=330) — pill shape (large rx)
+  'f1-data':        { x: 265, y: 80,  w: NODE_W, h: NODE_H, label: 'f1-data',        type: 'topic',  color: '#00FF41', fill: 'url(#grad-topic)',    stroke: '#00FF41', filter: 'glow-green' },
+  'iot-raw':        { x: 265, y: 190, w: NODE_W, h: NODE_H, label: 'iot-raw',         type: 'topic',  color: '#00FF41', fill: 'url(#grad-topic)',    stroke: '#00FF41', filter: 'glow-green' },
+  'social-stream':  { x: 265, y: 300, w: NODE_W, h: NODE_H, label: 'social-stream',   type: 'topic',  color: '#00FF41', fill: 'url(#grad-topic)',    stroke: '#00FF41', filter: 'glow-green' },
+  'opc-telemetry':  { x: 265, y: 410, w: NODE_W, h: NODE_H, label: 'opc-telemetry',  type: 'topic',  color: '#00FF41', fill: 'url(#grad-topic)',    stroke: '#00FF41', filter: 'glow-green' },
+
+  // Processors (col 3, cx=570)
+  'ml-enricher':   { x: 505, y: 80,  w: NODE_W, h: NODE_H, label: 'ML Enricher',    type: 'processor', color: '#9B59B6', fill: 'url(#grad-processor)', stroke: '#9B59B6', filter: 'glow-purple' },
+  'anomaly':       { x: 505, y: 220, w: NODE_W, h: NODE_H, label: 'Anomaly Detect', type: 'processor', color: '#9B59B6', fill: 'url(#grad-processor)', stroke: '#9B59B6', filter: 'glow-purple' },
+  'sentiment':     { x: 505, y: 340, w: NODE_W, h: NODE_H, label: 'Sentiment AI',   type: 'processor', color: '#9B59B6', fill: 'url(#grad-processor)', stroke: '#9B59B6', filter: 'glow-purple', ai: true },
+  'filter-route':  { x: 505, y: 460, w: NODE_W, h: NODE_H, label: 'Filter/Route',   type: 'processor', color: '#9B59B6', fill: 'url(#grad-processor)', stroke: '#9B59B6', filter: 'glow-purple' },
+
+  // Sinks (col 4, cx=810)
+  'influxdb':   { x: 745, y: 80,  w: NODE_W, h: NODE_H, label: 'InfluxDB',    type: 'sink', color: '#FF9500', fill: 'url(#grad-sink)', stroke: '#FF9500', filter: 'glow-amber' },
+  'grafana':    { x: 745, y: 220, w: NODE_W, h: NODE_H, label: 'Grafana',     type: 'sink', color: '#FF9500', fill: 'url(#grad-sink)', stroke: '#FF9500', filter: 'glow-amber' },
+  'postgres':   { x: 745, y: 340, w: NODE_W, h: NODE_H, label: 'PostgreSQL',  type: 'sink', color: '#FF9500', fill: 'url(#grad-sink)', stroke: '#FF9500', filter: 'glow-amber' },
+  'datalake':   { x: 745, y: 460, w: NODE_W, h: NODE_H, label: 'Data Lake',   type: 'sink', color: '#FF9500', fill: 'url(#grad-sink)', stroke: '#FF9500', filter: 'glow-amber' }
+};
+
+// Compute centres
+Object.values(nodes).forEach(n => {
+  n.cx = n.x + n.w / 2;
+  n.cy = n.y + n.h / 2;
+});
+
+// Connection topology: [fromId, toId, color, throughputKey]
+const connections = [
+  // Sources → Topics
+  ['f1-sensor',   'f1-data',       '#00D2BE', 'f1-data'],
+  ['iot-fleet',   'iot-raw',       '#00D2BE', 'iot-raw'],
+  ['social-api',  'social-stream', '#00D2BE', 'social-stream'],
+  ['opc-ua',      'opc-telemetry', '#00D2BE', 'opc-telemetry'],
+
+  // Topics → Processors (fan-out)
+  ['f1-data',       'ml-enricher',  '#00FF41', 'f1-data'],
+  ['f1-data',       'anomaly',      '#00FF41', 'f1-data'],
+  ['iot-raw',       'anomaly',      '#00FF41', 'iot-raw'],
+  ['iot-raw',       'filter-route', '#00FF41', 'iot-raw'],
+  ['social-stream', 'sentiment',    '#00FF41', 'social-stream'],
+  ['social-stream', 'filter-route', '#00FF41', 'social-stream'],
+  ['opc-telemetry', 'ml-enricher',  '#00FF41', 'opc-telemetry'],
+  ['opc-telemetry', 'filter-route', '#00FF41', 'opc-telemetry'],
+
+  // Processors → Sinks
+  ['ml-enricher',  'influxdb',  '#9B59B6', 'f1-data'],
+  ['ml-enricher',  'grafana',   '#9B59B6', 'f1-data'],
+  ['anomaly',      'grafana',   '#9B59B6', 'iot-raw'],
+  ['anomaly',      'postgres',  '#9B59B6', 'iot-raw'],
+  ['sentiment',    'postgres',  '#9B59B6', 'social-stream'],
+  ['sentiment',    'datalake',  '#9B59B6', 'social-stream'],
+  ['filter-route', 'datalake',  '#9B59B6', 'opc-telemetry'],
+  ['filter-route', 'influxdb',  '#9B59B6', 'opc-telemetry']
+];
+
+// Node stats for popup
+const nodeStats = {
+  'f1-sensor':   { msIn: 0,    msOut: 4241, latency: 2,  lag: 12,  status: 'RUNNING' },
+  'iot-fleet':   { msIn: 0,    msOut: 2817, latency: 3,  lag: 38,  status: 'RUNNING' },
+  'social-api':  { msIn: 0,    msOut: 5934, latency: 1,  lag: 8,   status: 'RUNNING' },
+  'opc-ua':      { msIn: 0,    msOut: 1831, latency: 5,  lag: 142, status: 'RUNNING' },
+  'f1-data':     { msIn: 4241, msOut: 4241, latency: 4,  lag: 12,  status: 'RUNNING' },
+  'iot-raw':     { msIn: 2817, msOut: 2817, latency: 6,  lag: 38,  status: 'RUNNING' },
+  'social-stream':{ msIn: 5934,msOut: 5934, latency: 3,  lag: 8,   status: 'RUNNING' },
+  'opc-telemetry':{ msIn: 1831,msOut: 1831, latency: 8,  lag: 142, status: 'RUNNING' },
+  'ml-enricher': { msIn: 6072, msOut: 5800, latency: 12, lag: 18,  status: 'RUNNING' },
+  'anomaly':     { msIn: 7058, msOut: 6900, latency: 8,  lag: 24,  status: 'RUNNING' },
+  'sentiment':   { msIn: 5934, msOut: 5800, latency: 4,  lag: 8,   status: 'RUNNING', ai: true },
+  'filter-route':{ msIn: 9582, msOut: 9400, latency: 2,  lag: 15,  status: 'RUNNING' },
+  'influxdb':    { msIn: 9000, msOut: 0,    latency: 5,  lag: 30,  status: 'RUNNING' },
+  'grafana':     { msIn: 10700,msOut: 0,    latency: 3,  lag: 20,  status: 'RUNNING' },
+  'postgres':    { msIn: 12700,msOut: 0,    latency: 11, lag: 55,  status: 'RUNNING' },
+  'datalake':    { msIn: 15200,msOut: 0,    latency: 22, lag: 88,  status: 'RUNNING' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// SVG HELPERS
+// ═══════════════════════════════════════════════════════════
+const svgNS = 'http://www.w3.org/2000/svg';
+
+function svgEl(tag, attrs = {}) {
+  const el = document.createElementNS(svgNS, tag);
+  Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+  return el;
+}
+
+function bezierPoint(x1,y1,cx1,cy1,cx2,cy2,x2,y2,t) {
+  const mt = 1 - t;
+  return {
+    x: mt*mt*mt*x1 + 3*mt*mt*t*cx1 + 3*mt*t*t*cx2 + t*t*t*x2,
+    y: mt*mt*mt*y1 + 3*mt*mt*t*cy1 + 3*mt*t*t*cy2 + t*t*t*y2
+  };
+}
+
+function makeBezierPath(from, to) {
+  const fx = from.x + from.w; // right edge
+  const fy = from.cy;
+  const tx = to.x;            // left edge
+  const ty = to.cy;
+  const cpDist = Math.abs(tx - fx) * 0.45;
+  return {
+    d: `M ${fx} ${fy} C ${fx + cpDist} ${fy}, ${tx - cpDist} ${ty}, ${tx} ${ty}`,
+    fx, fy, tx, ty,
+    c1x: fx + cpDist, c1y: fy,
+    c2x: tx - cpDist, c2y: ty
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER PIPELINE
+// ═══════════════════════════════════════════════════════════
+const connectionLayer = document.getElementById('connections');
+const nodesLayer = document.getElementById('nodes');
+const particleLayer = document.getElementById('particles');
+
+// Store path data for particle animation
+const pathData = [];
+
+function renderConnections() {
+  connections.forEach((conn, idx) => {
+    const [fromId, toId, color] = conn;
+    const from = nodes[fromId];
+    const to = nodes[toId];
+    const bp = makeBezierPath(from, to);
+
+    const path = svgEl('path', {
+      d: bp.d,
+      class: 'conn-path',
+      stroke: color,
+      'stroke-dasharray': '4,8',
+      id: `path-${idx}`
+    });
+    connectionLayer.appendChild(path);
+
+    pathData.push({
+      idx, fromId, toId, color,
+      fx: bp.fx, fy: bp.fy,
+      tx: bp.tx, ty: bp.ty,
+      c1x: bp.c1x, c1y: bp.c1y,
+      c2x: bp.c2x, c2y: bp.c2y,
+      throughputKey: conn[3]
+    });
+  });
+}
+
+function renderNodes() {
+  Object.entries(nodes).forEach(([id, n]) => {
+    const g = svgEl('g', { class: 'node-group', id: `node-${id}` });
+
+    const rx = n.type === 'topic' ? 20 : 7;
+
+    // Background rect
+    const rect = svgEl('rect', {
+      x: n.x, y: n.y, width: n.w, height: n.h,
+      rx, ry: rx,
+      fill: n.fill,
+      stroke: n.stroke,
+      'stroke-width': n.ai ? '1.5' : '1',
+      class: n.ai ? 'sentiment-glow' : '',
+      filter: n.ai ? 'url(#glow-purple)' : `url(#${n.filter})`
+    });
+    g.appendChild(rect);
+
+    // Inner subtle rect for depth
+    const inner = svgEl('rect', {
+      x: n.x + 1, y: n.y + 1, width: n.w - 2, height: n.h - 2,
+      rx: rx - 1, ry: rx - 1,
+      fill: 'none',
+      stroke: n.stroke,
+      'stroke-width': '0.3',
+      opacity: '0.3'
+    });
+    g.appendChild(inner);
+
+    // Node label
+    const label = svgEl('text', {
+      x: n.cx, y: n.cy,
+      class: 'node-label',
+      fill: n.type === 'topic' ? '#00FF41' : n.type === 'source' ? '#00D2BE' : n.type === 'processor' ? '#C084FC' : '#FFB74D',
+      'font-size': n.label.length > 12 ? '9' : '11'
+    });
+    label.textContent = n.label;
+    g.appendChild(label);
+
+    // AI Badge for Sentiment AI
+    if (n.ai) {
+      const badgeBg = svgEl('rect', {
+        x: n.x + n.w - 22, y: n.y - 1,
+        width: 20, height: 13,
+        rx: 3, fill: '#7C3AED',
+        stroke: '#A78BFA', 'stroke-width': '0.8'
+      });
+      g.appendChild(badgeBg);
+
+      const badgeText = svgEl('text', {
+        x: n.x + n.w - 12, y: n.y + 8,
+        class: 'ai-badge',
+        fill: '#fff',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        'font-size': '7',
+        'font-weight': '800',
+        'font-family': 'JetBrains Mono, monospace'
+      });
+      badgeText.textContent = 'AI';
+      g.appendChild(badgeText);
+
+      // Subtitle
+      const sub = svgEl('text', {
+        x: n.cx, y: n.y + n.h + 11,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'middle',
+        fill: '#7C3AED',
+        'font-size': '7',
+        'font-family': 'JetBrains Mono, monospace',
+        opacity: '0.8'
+      });
+      sub.textContent = 'model: quix-sentiment-v2 | 4ms';
+      g.appendChild(sub);
+    }
+
+    // Type indicator dot (top-left corner)
+    const dot = svgEl('circle', {
+      cx: n.x + 10, cy: n.y + 10, r: 3,
+      fill: n.stroke, opacity: '0.7'
+    });
+    g.appendChild(dot);
+
+    // Click handler
+    g.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showPopup(id, e);
+    });
+
+    nodesLayer.appendChild(g);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PARTICLES
+// ═══════════════════════════════════════════════════════════
+let activeParticles = [];
+
+function spawnParticle(pd) {
+  const el = svgEl('circle', {
+    r: '3',
+    fill: pd.color,
+    filter: 'url(#glow-particle)',
+    opacity: '0'
+  });
+  particleLayer.appendChild(el);
+
+  const p = {
+    el,
+    pd,
+    t: 0,
+    duration: 1200 + Math.random() * 300,
+    startTime: performance.now()
+  };
+  activeParticles.push(p);
+
+  // Heartbeat on source node
+  triggerHeartbeat(pd.fromId);
+}
+
+function triggerHeartbeat(nodeId) {
+  const g = document.getElementById(`node-${nodeId}`);
+  if (!g) return;
+  g.classList.add('heartbeat');
+  setTimeout(() => g.classList.remove('heartbeat'), 300);
+}
+
+function updateParticles(now) {
+  activeParticles = activeParticles.filter(p => {
+    p.t = Math.min(1, (now - p.startTime) / p.duration);
+    const pos = bezierPoint(
+      p.pd.fx, p.pd.fy,
+      p.pd.c1x, p.pd.c1y,
+      p.pd.c2x, p.pd.c2y,
+      p.pd.tx, p.pd.ty,
+      p.t
+    );
+
+    p.el.setAttribute('cx', pos.x);
+    p.el.setAttribute('cy', pos.y);
+
+    // Fade in/out envelope
+    let opacity;
+    if (p.t < 0.1) {
+      opacity = p.t / 0.1;
+    } else if (p.t > 0.75) {
+      opacity = (1 - p.t) / 0.25;
+    } else {
+      opacity = 1;
+    }
+    p.el.setAttribute('opacity', opacity.toFixed(3));
+
+    if (p.t >= 1) {
+      // Heartbeat on destination node when particle arrives
+      triggerHeartbeat(p.pd.toId);
+      p.el.remove();
+      return false;
+    }
+    return true;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIDEBAR SPARKLINES
+// ═══════════════════════════════════════════════════════════
+function buildSidebar() {
+  const container = document.getElementById('topic-cards');
+  container.innerHTML = '';
+
+  const topicOrder = ['f1-data', 'iot-raw', 'social-stream', 'opc-telemetry'];
+  topicOrder.forEach(key => {
+    const t = state.topics[key];
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.id = `tc-${key}`;
+
+    card.innerHTML = `
+      <div class="topic-name">${key}</div>
+      <div class="topic-sparkline-row">
+        <svg class="topic-sparkline" id="spark-${key}" width="80" height="28" viewBox="0 0 80 28"></svg>
+        <div>
+          <div class="topic-rate" id="sr-${key}">${t.msgSec.toLocaleString()}</div>
+          <span class="topic-rate-unit">msg/s</span>
+        </div>
+      </div>
+      <div class="lag-row">
+        <span class="lag-label">LAG</span>
+        <div class="lag-bar-track">
+          <div class="lag-bar-fill" id="lag-bar-${key}" style="width:0%"></div>
+        </div>
+        <span class="lag-value" id="lag-val-${key}">${t.lag}ms</span>
+      </div>
+    `;
+    container.appendChild(card);
+    drawSparkline(key);
+    updateLagBar(key);
+  });
+}
+
+function drawSparkline(key) {
+  const t = state.topics[key];
+  const svg = document.getElementById(`spark-${key}`);
+  if (!svg) return;
+  svg.innerHTML = '';
+
+  const W = 80, H = 28;
+  const vals = t.history.slice(-30);
+  const max = Math.max(...vals) * 1.1 || 1;
+  const min = Math.min(...vals) * 0.9;
+
+  const pts = vals.map((v, i) => {
+    const x = (i / (vals.length - 1)) * W;
+    const y = H - ((v - min) / (max - min)) * H * 0.9 - 2;
+    return `${x},${y}`;
+  });
+
+  // Area fill
+  const area = document.createElementNS(svgNS, 'polyline');
+  area.setAttribute('points', pts.join(' '));
+  area.setAttribute('fill', 'none');
+  area.setAttribute('stroke', t.color);
+  area.setAttribute('stroke-width', '1.5');
+  area.setAttribute('stroke-linejoin', 'round');
+  area.setAttribute('opacity', '0.85');
+  svg.appendChild(area);
+
+  // Last point dot
+  const lastPt = pts[pts.length - 1].split(',');
+  const dot = document.createElementNS(svgNS, 'circle');
+  dot.setAttribute('cx', lastPt[0]);
+  dot.setAttribute('cy', lastPt[1]);
+  dot.setAttribute('r', '2');
+  dot.setAttribute('fill', t.color);
+  svg.appendChild(dot);
+}
+
+function updateLagBar(key) {
+  const t = state.topics[key];
+  const bar = document.getElementById(`lag-bar-${key}`);
+  const val = document.getElementById(`lag-val-${key}`);
+  if (!bar || !val) return;
+
+  val.textContent = `${t.lag}ms`;
+
+  let pct, color;
+  if (t.lag <= 50) {
+    pct = (t.lag / 50) * 40;
+    color = '#00FF41';
+  } else if (t.lag <= 500) {
+    pct = 40 + ((t.lag - 50) / 450) * 40;
+    color = '#FF9500';
+  } else {
+    pct = 80 + Math.min(20, (t.lag - 500) / 100);
+    color = '#FF2D2D';
+  }
+  bar.style.width = `${pct}%`;
+  bar.style.background = color;
+  bar.style.boxShadow = `0 0 6px ${color}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVENT LOG
+// ═══════════════════════════════════════════════════════════
+const logEntries = document.getElementById('log-entries');
+const MAX_LOG = 5;
+
+function addLogEntry(level, topic, msg) {
+  const now = new Date();
+  const ts = now.toTimeString().slice(0, 8) + '.' + String(now.getMilliseconds()).padStart(3, '0');
+
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${level.toLowerCase()}`;
+
+  const levelStr = level.padEnd(7);
+  const topicStr = topic.padEnd(18);
+
+  entry.innerHTML = `<span class="log-ts">[${ts}]</span><span class="log-level">${levelStr}</span><span class="log-topic">${topicStr}</span><span class="log-msg">${msg}</span>`;
+
+  logEntries.insertBefore(entry, logEntries.firstChild);
+
+  // Remove excess entries
+  while (logEntries.children.length > MAX_LOG) {
+    logEntries.removeChild(logEntries.lastChild);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// HEADER METRICS
+// ═══════════════════════════════════════════════════════════
+function updateHeader() {
+  document.getElementById('m-throughput').textContent = Math.round(state.totalMsgSec).toLocaleString();
+
+  const elapsed = Math.floor((Date.now() - state.uptimeStart) / 1000);
+  const d = Math.floor(elapsed / 86400);
+  const h = Math.floor((elapsed % 86400) / 3600);
+  const m = Math.floor((elapsed % 3600) / 60);
+  const s = elapsed % 60;
+  document.getElementById('m-uptime').textContent =
+    `${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+
+  const alertEl = document.getElementById('m-alerts');
+  alertEl.textContent = state.alertCount;
+  alertEl.className = 'metric-value ' + (state.alertCount === 0 ? 'alerts-ok' : state.alertCount < 3 ? 'alerts-warn' : 'alerts-error');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NODE POPUP
+// ═══════════════════════════════════════════════════════════
+const popup = document.getElementById('node-popup');
+document.getElementById('popup-close').addEventListener('click', () => {
+  popup.style.display = 'none';
+});
+document.addEventListener('click', () => {
+  popup.style.display = 'none';
+});
+
+function showPopup(nodeId, event) {
+  const n = nodes[nodeId];
+  const stats = nodeStats[nodeId];
+  if (!n || !stats) return;
+
+  document.getElementById('popup-name').textContent = n.label;
+
+  const badge = document.getElementById('popup-badge');
+  badge.textContent = n.type.toUpperCase();
+  badge.className = `popup-type-badge badge-${n.type}`;
+
+  const statusEl = document.getElementById('popup-status');
+  statusEl.textContent = stats.status;
+  statusEl.className = `status-pill status-${stats.status.toLowerCase()}`;
+
+  document.getElementById('popup-in').textContent = stats.msIn.toLocaleString();
+  document.getElementById('popup-out').textContent = stats.msOut.toLocaleString();
+  document.getElementById('popup-latency').textContent = stats.latency;
+  document.getElementById('popup-lag').textContent = stats.lag;
+
+  const aiSection = document.getElementById('popup-ai-section');
+  aiSection.style.display = n.ai ? 'block' : 'none';
+
+  // Position popup near click, keeping in viewport
+  const rect = document.getElementById('app').getBoundingClientRect();
+  let left = event.clientX + 12;
+  let top = event.clientY - 20;
+  if (left + 290 > rect.right) left = event.clientX - 300;
+  if (top + 320 > rect.bottom) top = rect.bottom - 330;
+  popup.style.left = `${left}px`;
+  popup.style.top = `${top}px`;
+  popup.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// SIMULATION
+// ═══════════════════════════════════════════════════════════
+
+// Smooth noise with Perlin-like feel using multiple sine waves
+function smoothNoise(t, freq1, freq2, amp) {
+  return amp * (Math.sin(t * freq1) * 0.6 + Math.sin(t * freq2 * 1.3) * 0.4);
+}
+
+let simTime = 0;
+let lastParticleEmit = 0;
+
+// Fluctuate throughput (200ms)
+setInterval(() => {
+  simTime += 0.2;
+  const noise = smoothNoise(simTime, 0.3, 0.7, 1500);
+  state.totalMsgSec = 14823 + noise;
+
+  const topicKeys = Object.keys(state.topics);
+  topicKeys.forEach((k, i) => {
+    const t = state.topics[k];
+    const topicNoise = smoothNoise(simTime + i * 2.1, 0.4, 0.9, t.msgSec * 0.12);
+    const newRate = Math.max(100, t.msgSec + topicNoise);
+
+    // Update history
+    t.history.push(newRate);
+    if (t.history.length > 30) t.history.shift();
+
+    // Lag fluctuation
+    const lagNoise = Math.sin(simTime * 0.5 + i) * 5;
+    t.lag = Math.max(1, Math.round(t.lag + lagNoise * 0.3));
+
+    // Update sidebar
+    const rateEl = document.getElementById(`sr-${k}`);
+    if (rateEl) rateEl.textContent = Math.round(newRate).toLocaleString();
+    drawSparkline(k);
+    updateLagBar(k);
+
+    // Update nodeStats for popup
+    if (nodeStats[k]) {
+      nodeStats[k].msIn = Math.round(newRate);
+      nodeStats[k].msOut = Math.round(newRate);
+    }
+  });
+
+  // Recalculate total
+  state.totalMsgSec = topicKeys.reduce((s, k) => s + state.topics[k].history[state.topics[k].history.length - 1], 0);
+  updateHeader();
+}, 200);
+
+// Emit particles (500ms)
+setInterval(() => {
+  pathData.forEach((pd, idx) => {
+    const topicRate = state.topics[pd.throughputKey]
+      ? state.topics[pd.throughputKey].history[state.topics[pd.throughputKey].history.length - 1]
+      : 2000;
+
+    // Emit 1-4 particles based on throughput
+    const count = Math.max(1, Math.round(topicRate / 3000));
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => spawnParticle(pd), Math.random() * 450);
+    }
+  });
+}, 500);
+
+// Random WARN log entries (5s)
+const topicNames = Object.keys(state.topics);
+setInterval(() => {
+  const t = topicNames[Math.floor(Math.random() * topicNames.length)];
+  const rate = state.topics[t].history[state.topics[t].history.length - 1];
+  const spike = (rate * (1.5 + Math.random())).toFixed(0);
+  addLogEntry('WARN', t, `spike detected: ${Number(spike).toLocaleString()} msg/s`);
+  state.alertCount = Math.min(3, state.alertCount + 1);
+  setTimeout(() => {
+    state.alertCount = Math.max(0, state.alertCount - 1);
+  }, 8000);
+}, 5000);
+
+// Info log entries (2.5s)
+setInterval(() => {
+  const msgs = [
+    () => {
+      const t = 'f1-data';
+      const r = state.topics[t].history[state.topics[t].history.length - 1];
+      return [`INFO`, t, `${Math.round(r).toLocaleString()} msg/s  lag: ${state.topics[t].lag}ms   ✓`];
+    },
+    () => [`INFO`, 'Sentiment AI', `inference 4ms  batch: 64`],
+    () => {
+      const t = 'iot-raw';
+      return [`INFO`, t, `consumer group rebalanced  partitions: 8`];
+    },
+    () => [`INFO`, 'ML Enricher', `model checkpoint ok  loss: 0.0012`],
+    () => [`INFO`, 'opc-telemetry', `${Math.round(state.topics['opc-telemetry'].msgSec).toLocaleString()} msg/s  lag: ${state.topics['opc-telemetry'].lag}ms   ✓`],
+    () => [`INFO`, 'Filter/Route', `routing table updated  rules: 24`]
+  ];
+  const pick = msgs[Math.floor(Math.random() * msgs.length)]();
+  addLogEntry(pick[0], pick[1], pick[2]);
+}, 2500);
+
+// Simulate connection drop (30s)
+setInterval(() => {
+  const sources = ['f1-sensor', 'iot-fleet', 'social-api', 'opc-ua'];
+  const src = sources[Math.floor(Math.random() * sources.length)];
+  const n = nodes[src];
+  const g = document.getElementById(`node-${src}`);
+
+  addLogEntry('ERROR', nodes[src].label, `connection timeout — retrying...`);
+  state.alertCount = Math.min(5, state.alertCount + 2);
+
+  if (g) {
+    const rect = g.querySelector('rect');
+    if (rect) {
+      rect.setAttribute('stroke', '#FF2D2D');
+      nodeStats[src].status = 'ERROR';
+    }
+  }
+
+  setTimeout(() => {
+    if (g) {
+      const rect = g.querySelector('rect');
+      if (rect) {
+        rect.setAttribute('stroke', n.stroke);
+        nodeStats[src].status = 'RUNNING';
+      }
+    }
+    addLogEntry('INFO', nodes[src].label, `connection restored  ✓`);
+    state.alertCount = Math.max(0, state.alertCount - 2);
+  }, 3000);
+}, 30000);
+
+// Initial log entries
+setTimeout(() => addLogEntry('INFO', 'f1-data', '4,241 msg/s  lag: 12ms   ✓'), 100);
+setTimeout(() => addLogEntry('INFO', 'Sentiment AI', 'inference 4ms  batch: 64'), 400);
+setTimeout(() => addLogEntry('INFO', 'social-stream', '5,934 msg/s  lag: 8ms   ✓'), 700);
+setTimeout(() => addLogEntry('INFO', 'ML Enricher', 'model ready  quix-enricher-v3'), 1000);
+setTimeout(() => addLogEntry('INFO', 'opc-telemetry', '1,831 msg/s  lag: 142ms'), 1300);
+
+// ═══════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════
+function animate(now) {
+  updateParticles(now);
+  requestAnimationFrame(animate);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+renderConnections();
+renderNodes();
+buildSidebar();
+updateHeader();
+requestAnimationFrame(animate);
+
+// Animate connection path dash offset for flow effect
+let dashOffset = 0;
+setInterval(() => {
+  dashOffset -= 1;
+  document.querySelectorAll('.conn-path').forEach(p => {
+    p.setAttribute('stroke-dashoffset', dashOffset);
+  });
+}, 50);
+
+})();
+</script>
+</body>
+</html>

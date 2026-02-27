@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Stream Dashboard — Quix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080B10;
+    --panel:     #0C1018;
+    --border:    #1A2030;
+    --green:     #00FF88;
+    --red:       #FF3355;
+    --btc:       #F7931A;
+    --eth:       #627EEA;
+    --sol:       #14F195;
+    --doge:      #C2A633;
+    --ada:       #0033AD;
+    --matic:     #8247E5;
+    --link:      #2A5ADA;
+    --avax:      #E84142;
+    --text:      #E8EDF5;
+    --dim:       #556080;
+    --teal:      #00D4FF;
+    --ticker-h:  40px;
+    --footer-h:  52px;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  /* ── LAYOUT ─────────────────────────────────────────────────────── */
+  #root {
+    display: grid;
+    grid-template-rows: var(--ticker-h) 1fr var(--footer-h);
+    width: 100vw;
+    height: 100vh;
+  }
+
+  #main-area {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+  }
+
+  .panel {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .panel:last-child { border-right: none; }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(26,32,48,0.6);
+    flex-shrink: 0;
+  }
+
+  .panel-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* ── TICKER STRIP ───────────────────────────────────────────────── */
+  #ticker-strip {
+    background: #08090F;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  #ticker-strip::before,
+  #ticker-strip::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  #ticker-strip::before { left: 0; background: linear-gradient(to right, #08090F, transparent); }
+  #ticker-strip::after  { right: 0; background: linear-gradient(to left, #08090F, transparent); }
+
+  .ticker-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: ticker 35s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 24px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-right: 1px solid var(--border);
+  }
+
+  .ticker-symbol { color: var(--dim); font-size: 11px; letter-spacing: 1px; }
+  .ticker-price  { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--text); }
+  .ticker-change { font-size: 12px; font-weight: 700; }
+  .ticker-change.up   { color: var(--green); }
+  .ticker-change.down { color: var(--red); }
+
+  /* ── CHART PANEL ────────────────────────────────────────────────── */
+  #chart-panel { grid-column: 1; }
+
+  .coin-tabs {
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .coin-tab {
+    padding: 7px 18px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--dim);
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .coin-tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .coin-tab.active { color: var(--text); border-bottom-color: var(--accent, var(--green)); background: rgba(255,255,255,0.04); }
+
+  .chart-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    padding: 8px 16px 6px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .chart-coin-name {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .chart-price-big {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .chart-change-badge {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-bottom: 3px;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .chart-change-badge.up   { background: rgba(0,255,136,0.12); color: var(--green); }
+  .chart-change-badge.down { background: rgba(255,51,85,0.12);  color: var(--red); }
+
+  .chart-meta {
+    margin-left: auto;
+    text-align: right;
+  }
+  .chart-meta-label { font-size: 10px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+  .chart-meta-val   { font-family: 'Space Grotesk', sans-serif; font-size: 13px; color: var(--text); }
+
+  #chart-svg-container {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    padding: 10px 0 0 0;
+  }
+
+  #chart-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ── ORDER BOOK ─────────────────────────────────────────────────── */
+  #orderbook-panel {
+    grid-column: 2;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+  }
+
+  .ob-cols {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr 0.8fr;
+    gap: 0;
+    padding: 4px 10px;
+    color: var(--dim);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .ob-cols span:last-child { text-align: right; }
+
+  .ob-section { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+  .ob-asks { flex-direction: column-reverse; }
+
+  .ob-row {
+    display: grid;
+    grid-template-columns: 1fr 0.7fr 0.8fr;
+    align-items: center;
+    padding: 2px 10px;
+    position: relative;
+    cursor: default;
+    transition: opacity 0.3s;
+  }
+  .ob-row:hover { background: rgba(255,255,255,0.03); }
+
+  .ob-depth-bar {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 0;
+    opacity: 0.12;
+    transition: width 0.4s ease;
+    pointer-events: none;
+  }
+  .ob-ask .ob-depth-bar { background: var(--red); }
+  .ob-bid .ob-depth-bar { background: var(--green); }
+
+  .ob-ask .ob-price { color: var(--red); }
+  .ob-bid .ob-price { color: var(--green); }
+  .ob-size, .ob-total { text-align: right; color: var(--text); }
+  .ob-total { color: var(--dim); }
+
+  .ob-mid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: rgba(26,32,48,0.8);
+    flex-shrink: 0;
+  }
+
+  .ob-mid-price {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .ob-spread {
+    font-size: 10px;
+    color: var(--dim);
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  /* ── WATCHLIST ──────────────────────────────────────────────────── */
+  #watchlist-panel {
+    grid-column: 3;
+  }
+
+  .wl-sort-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  .wl-list {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    border-bottom: 1px solid rgba(26,32,48,0.7);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.3s;
+    flex-shrink: 0;
+  }
+  .wl-row:hover { background: rgba(255,255,255,0.04); }
+  .wl-row.active { background: rgba(255,255,255,0.06); }
+
+  .wl-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.5px;
+  }
+
+  .wl-info { flex: 1; min-width: 0; }
+  .wl-name   { font-size: 13px; font-weight: 700; letter-spacing: 0.3px; line-height: 1.2; }
+  .wl-symbol { font-size: 10px; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+
+  .wl-right { text-align: right; flex-shrink: 0; }
+  .wl-price  {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .wl-pct {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .wl-pct.up   { color: var(--green); }
+  .wl-pct.down { color: var(--red); }
+
+  .wl-spark {
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  /* ── FOOTER ─────────────────────────────────────────────────────── */
+  #stats-footer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--border);
+    background: #08090F;
+  }
+
+  .stat-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6px 18px;
+    border-right: 1px solid var(--border);
+    gap: 2px;
+  }
+  .stat-cell:last-child { border-right: none; }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.3px;
+  }
+
+  .stat-sub {
+    font-size: 10px;
+    color: var(--dim);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* BTC Dominance bar */
+  .dom-bar-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 3px;
+    overflow: hidden;
+    width: 80px;
+  }
+  .dom-bar-fill {
+    height: 100%;
+    background: var(--btc);
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  /* Fear & Greed dial */
+  .fg-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .fg-dial {
+    width: 36px; height: 36px;
+    flex-shrink: 0;
+  }
+
+  /* Active streams pulse */
+  .stream-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    margin-right: 5px;
+    animation: pulse-dot 1s ease-in-out infinite;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .stat-value.teal { color: var(--teal); }
+
+  /* ── SVG GRIDLINES & MISC ───────────────────────────────────────── */
+  .grid-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
+  .price-line { stroke-width: 1; stroke-dasharray: 4 3; opacity: 0.9; }
+  .ema-line { stroke-width: 1.5; fill: none; opacity: 0.8; }
+  .vol-bar { opacity: 0.35; }
+  .candle-wick { stroke-width: 1; }
+
+  /* Flash animations */
+  @keyframes flash-green {
+    0%   { background: rgba(0,255,136,0.25); }
+    100% { background: transparent; }
+  }
+  @keyframes flash-red {
+    0%   { background: rgba(255,51,85,0.25); }
+    100% { background: transparent; }
+  }
+  .flash-up   { animation: flash-green 0.4s ease-out; }
+  .flash-down { animation: flash-red   0.4s ease-out; }
+
+  /* Quix branding stripe */
+  #quix-brand {
+    position: absolute;
+    top: 0; right: 0;
+    padding: 4px 10px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* Tooltip */
+  #candle-tooltip {
+    position: absolute;
+    background: rgba(12,16,24,0.95);
+    border: 1px solid var(--border);
+    padding: 7px 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    pointer-events: none;
+    display: none;
+    z-index: 10;
+    border-radius: 2px;
+    line-height: 1.8;
+    min-width: 130px;
+  }
+  #candle-tooltip span { color: var(--dim); }
+</style>
+</head>
+<body>
+<div id="root">
+
+  <!-- ── TICKER STRIP ── -->
+  <div id="ticker-strip">
+    <div class="ticker-track" id="ticker-track">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- ── MAIN AREA ── -->
+  <div id="main-area">
+
+    <!-- CHART PANEL -->
+    <div class="panel" id="chart-panel">
+      <div class="coin-tabs" id="coin-tabs"></div>
+      <div class="chart-header" id="chart-header">
+        <div>
+          <div class="chart-coin-name" id="chart-coin-name">Bitcoin</div>
+          <div class="chart-price-big" id="chart-price-big">$97,234.50</div>
+        </div>
+        <div class="chart-change-badge up" id="chart-change-badge">+2.34%</div>
+        <div class="chart-meta" style="margin-left:auto;">
+          <div class="chart-meta-label">24H HIGH</div>
+          <div class="chart-meta-val" id="chart-high">—</div>
+        </div>
+        <div class="chart-meta" style="margin-left:14px;">
+          <div class="chart-meta-label">24H LOW</div>
+          <div class="chart-meta-val" id="chart-low">—</div>
+        </div>
+        <div class="chart-meta" style="margin-left:14px;">
+          <div class="chart-meta-label">24H VOL</div>
+          <div class="chart-meta-val" id="chart-vol">—</div>
+        </div>
+      </div>
+      <div id="chart-svg-container">
+        <svg id="chart-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="candle-tooltip"></div>
+        <div id="quix-brand">POWERED BY QUIX STREAMS</div>
+      </div>
+    </div>
+
+    <!-- ORDER BOOK -->
+    <div class="panel" id="orderbook-panel">
+      <div class="panel-header">
+        <span class="panel-title">Order Book</span>
+        <span class="ob-spread" id="ob-spread-header" style="font-size:10px;"></span>
+      </div>
+      <div class="ob-cols">
+        <span>PRICE</span><span style="text-align:right;">SIZE</span><span style="text-align:right;">TOTAL</span>
+      </div>
+      <div class="ob-section ob-asks" id="ob-asks"></div>
+      <div class="ob-mid">
+        <div>
+          <div class="ob-mid-price" id="ob-mid-price">—</div>
+          <div style="font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:1px;">MID PRICE</div>
+        </div>
+        <div class="ob-spread" id="ob-spread"></div>
+      </div>
+      <div class="ob-section ob-bids" id="ob-bids"></div>
+    </div>
+
+    <!-- WATCHLIST -->
+    <div class="panel" id="watchlist-panel">
+      <div class="panel-header">
+        <span class="panel-title">Watchlist</span>
+        <span class="wl-sort-label">Sorted by 24H %</span>
+      </div>
+      <div class="wl-list" id="wl-list"></div>
+    </div>
+
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div id="stats-footer">
+    <div class="stat-cell">
+      <div class="stat-label">Global Market Cap</div>
+      <div class="stat-value" id="stat-mktcap">$3.42T</div>
+      <div class="stat-sub" id="stat-mktcap-sub">+1.8% in 24h</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">24H Volume</div>
+      <div class="stat-value" id="stat-vol">$187.3B</div>
+      <div class="stat-sub">Across 500+ exchanges</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">BTC Dominance</div>
+      <div class="stat-value" id="stat-dom">52.4%</div>
+      <div class="dom-bar-track"><div class="dom-bar-fill" id="dom-bar" style="width:52.4%"></div></div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Fear &amp; Greed</div>
+      <div class="fg-row">
+        <svg class="fg-dial" id="fg-dial" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div>
+          <div class="stat-value" id="stat-fg">72</div>
+          <div class="stat-sub" id="stat-fg-label" style="font-size:9px;letter-spacing:1px;text-transform:uppercase;">Greed</div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Active Streams</div>
+      <div class="stat-value teal"><span class="stream-dot"></span><span id="stat-streams">10,483</span> <span style="font-size:12px;font-weight:500;">msg/s</span></div>
+      <div class="stat-sub">Quix real-time pipeline</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════
+//  COIN STATE
+// ═══════════════════════════════════════════════════════════════════
+const coins = {
+  BTC:  { price: 97234,  open: 95018, vol: 0.018, trend: 0.00008,  color: '#F7931A', name: 'Bitcoin',   sym: 'BTC',  abbr: 'BT', spread: 8.0,   priceScale: 2 },
+  ETH:  { price: 3412,   open: 3320,  vol: 0.022, trend: 0.00005,  color: '#627EEA', name: 'Ethereum',  sym: 'ETH',  abbr: 'ET', spread: 0.4,   priceScale: 2 },
+  SOL:  { price: 186,    open: 181,   vol: 0.035, trend: 0.0002,   color: '#14F195', name: 'Solana',    sym: 'SOL',  abbr: 'SO', spread: 0.05,  priceScale: 2 },
+  DOGE: { price: 0.382,  open: 0.391, vol: 0.055, trend: -0.00012, color: '#C2A633', name: 'Dogecoin',  sym: 'DOGE', abbr: 'DO', spread: 0.0003,priceScale: 5 },
+  ADA:  { price: 0.612,  open: 0.598, vol: 0.040, trend: 0.0001,   color: '#0078D4', name: 'Cardano',   sym: 'ADA',  abbr: 'AD', spread: 0.0005,priceScale: 4 },
+  MATIC:{ price: 0.884,  open: 0.910, vol: 0.048, trend: -0.00009, color: '#8247E5', name: 'Polygon',   sym: 'MATIC',abbr: 'PO', spread: 0.001, priceScale: 4 },
+  LINK: { price: 14.72,  open: 14.50, vol: 0.032, trend: 0.00007,  color: '#2A5ADA', name: 'Chainlink', sym: 'LINK', abbr: 'LI', spread: 0.02,  priceScale: 3 },
+  AVAX: { price: 36.84,  open: 35.70, vol: 0.038, trend: 0.00015,  color: '#E84142', name: 'Avalanche', sym: 'AVAX', abbr: 'AV', spread: 0.04,  priceScale: 2 },
+};
+
+// Extra tickers (ticker-only, not on watchlist main chart)
+const extraTickers = {
+  XRP:  { price: 0.527,  vol: 0.030, trend: 0.0001,  color: '#00AAE4', name: 'XRP',     sym: 'XRP' },
+  DOT:  { price: 7.84,   vol: 0.035, trend: -0.00008, color: '#E6007A', name: 'Polkadot',sym: 'DOT' },
+};
+
+const ALL_TICKER = { ...coins, ...extraTickers };
+
+let activeTab = 'BTC';
+
+// Candle history: per coin, array of {o,h,l,c,v,t}
+const CANDLE_COUNT = 60;
+const candleHistory = {};
+
+function initCandleHistory(sym) {
+  const c = coins[sym];
+  let p = c.open * 0.97;
+  const arr = [];
+  const now = Date.now();
+  for (let i = CANDLE_COUNT; i >= 0; i--) {
+    const o = p;
+    const move = (Math.random() - 0.48) * c.vol * p * 0.012;
+    const c2 = o + move;
+    const h = Math.max(o, c2) + Math.random() * Math.abs(move) * 0.5;
+    const l = Math.min(o, c2) - Math.random() * Math.abs(move) * 0.5;
+    arr.push({ o, h, l, c: c2, v: Math.random() * 0.8 + 0.2, t: now - i * 3000 });
+    p = c2;
+  }
+  // Sync last close to current coin price
+  const last = arr[arr.length - 1];
+  const scale = c.price / last.c;
+  arr.forEach(cd => { cd.o *= scale; cd.h *= scale; cd.l *= scale; cd.c *= scale; });
+  coins[sym].price = last.c;
+  return arr;
+}
+
+Object.keys(coins).forEach(sym => {
+  candleHistory[sym] = initCandleHistory(sym);
+});
+
+// Price open tracking for 24h %
+Object.keys(coins).forEach(sym => { coins[sym].dayOpen = candleHistory[sym][0].o; });
+
+// Sparkline history per coin (20 points)
+const sparkHistory = {};
+Object.keys(coins).forEach(sym => {
+  sparkHistory[sym] = candleHistory[sym].slice(-20).map(cd => cd.c);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  PRICE WALK
+// ═══════════════════════════════════════════════════════════════════
+function walkPrice(sym) {
+  const c = coins[sym];
+  const noise = (Math.random() - 0.49) * 2;
+  const pct = c.trend + noise * c.vol * 0.006;
+  c.price *= (1 + pct);
+  if (c.price <= 0) c.price = 0.001;
+}
+
+function walkAll() {
+  Object.keys(coins).forEach(walkPrice);
+  Object.keys(extraTickers).forEach(sym => {
+    const c = extraTickers[sym];
+    const noise = (Math.random() - 0.49) * 2;
+    c.price *= (1 + c.trend + noise * c.vol * 0.006);
+    if (c.price <= 0) c.price = 0.001;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FORMATTING
+// ═══════════════════════════════════════════════════════════════════
+function fmtPrice(price, sym) {
+  if (!sym) {
+    if (price >= 100) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (price >= 1)   return price.toFixed(3);
+    return price.toFixed(5);
+  }
+  const c = coins[sym] || extraTickers[sym];
+  if (!c) return price.toFixed(2);
+  return price.toFixed(c.priceScale || 2);
+}
+
+function fmtPriceFull(price) {
+  if (price >= 1000) return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (price >= 1)    return '$' + price.toFixed(3);
+  return '$' + price.toFixed(5);
+}
+
+function fmtPct(cur, open) {
+  const pct = ((cur - open) / open) * 100;
+  return (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+}
+
+function fmtPctNum(cur, open) {
+  return ((cur - open) / open) * 100;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TICKER STRIP
+// ═══════════════════════════════════════════════════════════════════
+function buildTickerHTML() {
+  const syms = [...Object.keys(coins), ...Object.keys(extraTickers)];
+  let html = '';
+  syms.forEach(sym => {
+    const c = coins[sym] || extraTickers[sym];
+    const pct = fmtPctNum(c.price, c.open || c.price * 0.98);
+    const dir = pct >= 0 ? 'up' : 'down';
+    const arrow = pct >= 0 ? '▲' : '▼';
+    html += `<div class="ticker-item" id="tick-${sym}">
+      <span class="ticker-symbol">${sym}/USDT</span>
+      <span class="ticker-price" id="tick-price-${sym}">${fmtPriceFull(c.price)}</span>
+      <span class="ticker-change ${dir}" id="tick-pct-${sym}">${arrow} ${Math.abs(pct).toFixed(2)}%</span>
+    </div>`;
+  });
+  return html + html; // doubled for infinite scroll
+}
+
+function initTicker() {
+  const track = document.getElementById('ticker-track');
+  track.innerHTML = buildTickerHTML();
+}
+
+function updateTickerPrices() {
+  const syms = [...Object.keys(coins), ...Object.keys(extraTickers)];
+  syms.forEach(sym => {
+    const c = coins[sym] || extraTickers[sym];
+    const pct = fmtPctNum(c.price, c.open || c.price * 0.98);
+    const dir = pct >= 0 ? 'up' : 'down';
+    const arrow = pct >= 0 ? '▲' : '▼';
+    // Update both copies
+    document.querySelectorAll(`#tick-price-${sym}`).forEach(el => { el.textContent = fmtPriceFull(c.price); });
+    document.querySelectorAll(`#tick-pct-${sym}`).forEach(el => {
+      el.textContent = `${arrow} ${Math.abs(pct).toFixed(2)}%`;
+      el.className = `ticker-change ${dir}`;
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  COIN TABS
+// ═══════════════════════════════════════════════════════════════════
+function initTabs() {
+  const container = document.getElementById('coin-tabs');
+  container.innerHTML = '';
+  ['BTC','ETH','SOL','DOGE'].forEach(sym => {
+    const btn = document.createElement('button');
+    btn.className = 'coin-tab' + (sym === activeTab ? ' active' : '');
+    btn.textContent = sym;
+    btn.style.setProperty('--accent', coins[sym].color);
+    btn.addEventListener('click', () => switchTab(sym));
+    container.appendChild(btn);
+  });
+}
+
+function switchTab(sym) {
+  if (!coins[sym]) return;
+  activeTab = sym;
+  document.querySelectorAll('.coin-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === sym);
+  });
+  document.querySelectorAll('.wl-row').forEach(row => {
+    row.classList.toggle('active', row.dataset.sym === sym);
+  });
+  renderChart();
+  updateChartHeader();
+  updateOrderBook();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CHART HEADER
+// ═══════════════════════════════════════════════════════════════════
+function updateChartHeader() {
+  const coin = coins[activeTab];
+  const candles = candleHistory[activeTab];
+  document.getElementById('chart-coin-name').textContent = coin.name;
+  const priceEl = document.getElementById('chart-price-big');
+  priceEl.textContent = fmtPriceFull(coin.price);
+  priceEl.style.color = coin.color;
+
+  const pct = fmtPctNum(coin.price, coin.dayOpen);
+  const badge = document.getElementById('chart-change-badge');
+  badge.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+  badge.className = 'chart-change-badge ' + (pct >= 0 ? 'up' : 'down');
+
+  // 24h high/low from candle history
+  let high = -Infinity, low = Infinity, vol = 0;
+  candles.forEach(cd => {
+    if (cd.h > high) high = cd.h;
+    if (cd.l < low)  low  = cd.l;
+    vol += cd.v;
+  });
+  document.getElementById('chart-high').textContent = fmtPriceFull(high);
+  document.getElementById('chart-low').textContent  = fmtPriceFull(low);
+  document.getElementById('chart-vol').textContent  = vol.toFixed(2) + ' ' + activeTab;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CANDLESTICK CHART
+// ═══════════════════════════════════════════════════════════════════
+let chartResizeObs;
+let lastChartWidth = 0, lastChartHeight = 0;
+
+function renderChart() {
+  const svg = document.getElementById('chart-svg');
+  const container = document.getElementById('chart-svg-container');
+  const W = container.clientWidth;
+  const H = container.clientHeight;
+  if (W < 10 || H < 10) return;
+
+  const coin     = coins[activeTab];
+  const candles  = candleHistory[activeTab];
+  const color    = coin.color;
+
+  const PAD_L = 66, PAD_R = 10, PAD_T = 14, PAD_B = 38;
+  const VOL_H = Math.floor(H * 0.16);
+  const chartH = H - PAD_T - PAD_B - VOL_H - 6;
+  const chartW = W - PAD_L - PAD_R;
+
+  // Price range
+  let minP = Infinity, maxP = -Infinity;
+  candles.forEach(cd => { if (cd.l < minP) minP = cd.l; if (cd.h > maxP) maxP = cd.h; });
+  const pad = (maxP - minP) * 0.06;
+  minP -= pad; maxP += pad;
+  const priceRange = maxP - minP;
+
+  const candleW   = chartW / CANDLE_COUNT;
+  const bodyW     = Math.max(1, candleW * 0.6);
+  const bodyOff   = (candleW - bodyW) / 2;
+
+  const toY = p => PAD_T + chartH - ((p - minP) / priceRange) * chartH;
+  const toX = i => PAD_L + i * candleW;
+
+  let svgContent = '';
+
+  // Grid lines
+  const gridCount = 5;
+  for (let g = 0; g <= gridCount; g++) {
+    const p = minP + (priceRange * g / gridCount);
+    const y = toY(p);
+    svgContent += `<line class="grid-line" x1="${PAD_L}" y1="${y}" x2="${W - PAD_R}" y2="${y}"/>`;
+    svgContent += `<text x="${PAD_L - 4}" y="${y + 4}" text-anchor="end" font-family="Space Grotesk,sans-serif" font-size="9" fill="#556080">${fmtPrice(p, activeTab)}</text>`;
+  }
+
+  // X axis time labels
+  for (let i = 0; i < CANDLE_COUNT; i += 10) {
+    const x = toX(i) + candleW / 2;
+    const ms = candles[i] ? candles[i].t : Date.now() - (CANDLE_COUNT - i) * 3000;
+    const d = new Date(ms);
+    const label = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+    svgContent += `<text x="${x}" y="${H - PAD_B + 14}" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="9" fill="#556080">${label}</text>`;
+  }
+
+  // Volume bars
+  let maxVol = 0;
+  candles.forEach(cd => { if (cd.v > maxVol) maxVol = cd.v; });
+  const volBase = H - PAD_B;
+  candles.forEach((cd, i) => {
+    const x   = toX(i) + bodyOff;
+    const vh  = (cd.v / maxVol) * VOL_H;
+    const bull = cd.c >= cd.o;
+    svgContent += `<rect class="vol-bar" x="${x}" y="${volBase - vh}" width="${bodyW}" height="${vh}" fill="${bull ? '#00FF88' : '#FF3355'}"/>`;
+  });
+
+  // EMA (20)
+  function calcEMA(data, period) {
+    const k = 2 / (period + 1);
+    const result = [];
+    let ema = data[0];
+    data.forEach((v, i) => {
+      if (i === 0) { result.push(ema); return; }
+      ema = v * k + ema * (1 - k);
+      result.push(ema);
+    });
+    return result;
+  }
+  const closes  = candles.map(cd => cd.c);
+  const emaVals = calcEMA(closes, 20);
+  let emaPoints = '';
+  emaVals.forEach((e, i) => { emaPoints += `${toX(i) + candleW/2},${toY(e)} `; });
+  svgContent += `<polyline class="ema-line" points="${emaPoints.trim()}" stroke="${color}"/>`;
+
+  // Candlesticks
+  candles.forEach((cd, i) => {
+    const x    = toX(i);
+    const bull = cd.c >= cd.o;
+    const fill = bull ? '#00FF88' : '#FF3355';
+    const openY  = toY(cd.o);
+    const closeY = toY(cd.c);
+    const highY  = toY(cd.h);
+    const lowY   = toY(cd.l);
+    const bY     = Math.min(openY, closeY);
+    const bH     = Math.max(1, Math.abs(closeY - openY));
+    const midX   = x + candleW / 2;
+
+    svgContent += `<line class="candle-wick" x1="${midX}" y1="${highY}" x2="${midX}" y2="${lowY}" stroke="${fill}"/>`;
+    svgContent += `<rect x="${x + bodyOff}" y="${bY}" width="${bodyW}" height="${bH}" fill="${fill}" data-i="${i}"/>`;
+  });
+
+  // Current price dashed line
+  const curY = toY(coin.price);
+  svgContent += `<line class="price-line" x1="${PAD_L}" y1="${curY}" x2="${W - PAD_R}" y2="${curY}" stroke="${color}" stroke-dasharray="4 3"/>`;
+  svgContent += `<rect x="${W - PAD_R - 1}" y="${curY - 9}" width="${PAD_R + 1}" height="18" fill="${color}" rx="2"/>`;
+  svgContent += `<text x="${W - PAD_R + PAD_R/2 - 1}" y="${curY + 4}" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="8" fill="#080B10" font-weight="700">${fmtPrice(coin.price, activeTab)}</text>`;
+
+  // Axes
+  svgContent += `<line x1="${PAD_L}" y1="${PAD_T}" x2="${PAD_L}" y2="${volBase}" stroke="#1A2030" stroke-width="1"/>`;
+  svgContent += `<line x1="${PAD_L}" y1="${volBase}" x2="${W - PAD_R}" y2="${volBase}" stroke="#1A2030" stroke-width="1"/>`;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = svgContent;
+
+  // Tooltip on hover
+  svg.addEventListener('mousemove', onChartHover);
+  svg.addEventListener('mouseleave', () => { document.getElementById('candle-tooltip').style.display = 'none'; });
+
+  function onChartHover(e) {
+    const rect  = svg.getBoundingClientRect();
+    const mx    = e.clientX - rect.left;
+    const my    = e.clientY - rect.top;
+    const i     = Math.floor((mx - PAD_L) / candleW);
+    if (i < 0 || i >= candles.length) { document.getElementById('candle-tooltip').style.display = 'none'; return; }
+    const cd  = candles[i];
+    const tip = document.getElementById('candle-tooltip');
+    tip.innerHTML = `
+      <span>O</span> ${fmtPrice(cd.o, activeTab)}&nbsp;&nbsp;<span>H</span> ${fmtPrice(cd.h, activeTab)}<br>
+      <span>L</span> ${fmtPrice(cd.l, activeTab)}&nbsp;&nbsp;<span>C</span> ${fmtPrice(cd.c, activeTab)}<br>
+      <span>Vol</span> ${cd.v.toFixed(3)}
+    `;
+    tip.style.display = 'block';
+    let tx = mx + 14, ty = my - 20;
+    if (tx + 140 > W) tx = mx - 150;
+    if (ty < 0) ty = 4;
+    tip.style.left = tx + 'px';
+    tip.style.top  = ty + 'px';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ORDER BOOK
+// ═══════════════════════════════════════════════════════════════════
+function generateBook(midPrice, spread) {
+  const asks = [], bids = [];
+  for (let i = 0; i < 12; i++) {
+    asks.push({
+      price: midPrice + spread / 2 + i * spread * 0.8 + Math.random() * spread * 0.2,
+      size:  Math.random() * 2.8 + 0.05
+    });
+    bids.push({
+      price: midPrice - spread / 2 - i * spread * 0.8 - Math.random() * spread * 0.2,
+      size:  Math.random() * 2.8 + 0.05
+    });
+  }
+  asks.sort((a, b) => a.price - b.price);
+  bids.sort((a, b) => b.price - a.price);
+  return { asks, bids };
+}
+
+function renderOrderBook(asks, bids, midPrice, spread, sym) {
+  const asksEl   = document.getElementById('ob-asks');
+  const bidsEl   = document.getElementById('ob-bids');
+  const midEl    = document.getElementById('ob-mid-price');
+  const spreadEl = document.getElementById('ob-spread');
+  const spreadH  = document.getElementById('ob-spread-header');
+
+  const coin = coins[sym];
+  const ps   = coin.priceScale || 2;
+
+  // Cumulative totals
+  let askCum = 0, bidCum = 0;
+  const asksA = asks.map(r => { askCum += r.size; return { ...r, total: askCum }; });
+  const bidsA = bids.map(r => { bidCum += r.size; return { ...r, total: bidCum }; });
+  const maxAskT = asksA[asksA.length - 1]?.total || 1;
+  const maxBidT = bidsA[bidsA.length - 1]?.total || 1;
+  const maxT    = Math.max(maxAskT, maxBidT);
+
+  function rowHTML(r, side) {
+    const barPct = (r.total / maxT * 100).toFixed(1);
+    return `<div class="ob-row ob-${side}">
+      <div class="ob-depth-bar" style="width:${barPct}%"></div>
+      <span class="ob-price">${r.price.toFixed(ps)}</span>
+      <span class="ob-size">${r.size.toFixed(4)}</span>
+      <span class="ob-total">${r.total.toFixed(3)}</span>
+    </div>`;
+  }
+
+  asksEl.innerHTML = asksA.map(r => rowHTML(r, 'ask')).join('');
+  bidsEl.innerHTML = bidsA.map(r => rowHTML(r, 'bid')).join('');
+
+  const pct    = (spread / midPrice * 100).toFixed(4);
+  midEl.textContent    = midPrice.toFixed(ps);
+  midEl.style.color    = coin.color;
+  spreadEl.innerHTML   = `Spread: ${spread.toFixed(ps)}<br><span style="color:var(--dim)">${pct}%</span>`;
+  spreadH.textContent  = `Spread: ${spread.toFixed(ps)}`;
+}
+
+function updateOrderBook() {
+  const sym   = activeTab;
+  const coin  = coins[sym];
+  const { asks, bids } = generateBook(coin.price, coin.spread);
+  renderOrderBook(asks, bids, coin.price, coin.spread, sym);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  WATCHLIST
+// ═══════════════════════════════════════════════════════════════════
+function renderSparkline(sym) {
+  const pts = sparkHistory[sym];
+  if (!pts || pts.length < 2) return '';
+  const W = 60, H = 20;
+  const minV = Math.min(...pts), maxV = Math.max(...pts);
+  const range = maxV - minV || 1;
+  const coords = pts.map((v, i) => {
+    const x = (i / (pts.length - 1)) * W;
+    const y = H - ((v - minV) / range) * H;
+    return `${x},${y}`;
+  }).join(' ');
+  const coin = coins[sym];
+  const up   = pts[pts.length - 1] >= pts[0];
+  return `<svg class="wl-spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="${coords}" fill="none" stroke="${up ? '#00FF88' : '#FF3355'}" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function buildWatchlistRows() {
+  const syms = Object.keys(coins).slice();
+  syms.sort((a, b) => {
+    const pa = fmtPctNum(coins[a].price, coins[a].dayOpen);
+    const pb = fmtPctNum(coins[b].price, coins[b].dayOpen);
+    return pb - pa;
+  });
+
+  const container = document.getElementById('wl-list');
+  container.innerHTML = '';
+  syms.forEach(sym => {
+    const c   = coins[sym];
+    const pct = fmtPctNum(c.price, c.dayOpen);
+    const dir = pct >= 0 ? 'up' : 'down';
+    const row = document.createElement('div');
+    row.className  = 'wl-row' + (sym === activeTab ? ' active' : '');
+    row.dataset.sym = sym;
+    row.innerHTML  = `
+      <div class="wl-icon" style="background:${c.color}22;color:${c.color};border:1px solid ${c.color}44">${c.abbr}</div>
+      <div class="wl-info">
+        <div class="wl-name">${c.name}</div>
+        <div class="wl-symbol">${sym}/USDT</div>
+      </div>
+      ${renderSparkline(sym)}
+      <div class="wl-right">
+        <div class="wl-price" id="wl-price-${sym}" style="color:${c.color}">${fmtPriceFull(c.price)}</div>
+        <div class="wl-pct ${dir}" id="wl-pct-${sym}">${(pct >= 0 ? '+' : '') + pct.toFixed(2)}%</div>
+      </div>
+    `;
+    row.addEventListener('click', () => switchTab(sym));
+    container.appendChild(row);
+  });
+}
+
+function updateWatchlistPrices() {
+  Object.keys(coins).forEach(sym => {
+    const c   = coins[sym];
+    const pct = fmtPctNum(c.price, c.dayOpen);
+    const dir = pct >= 0 ? 'up' : 'down';
+    const priceEl = document.getElementById(`wl-price-${sym}`);
+    const pctEl   = document.getElementById(`wl-pct-${sym}`);
+    if (priceEl) priceEl.textContent = fmtPriceFull(c.price);
+    if (pctEl)   {
+      pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+      pctEl.className   = `wl-pct ${dir}`;
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FOOTER STATS
+// ═══════════════════════════════════════════════════════════════════
+let mktCap       = 3.42;
+let vol24h       = 187.3;
+let btcDom       = 52.4;
+let fgIndex      = 72;
+let streamCount  = 10483;
+let mktCapDir    = 1;
+
+function updateFooterStats() {
+  // Market cap slow oscillation
+  mktCap += mktCapDir * (Math.random() * 0.002);
+  if (mktCap > 3.55) mktCapDir = -1;
+  if (mktCap < 3.30) mktCapDir =  1;
+  vol24h += (Math.random() - 0.5) * 0.5;
+  if (vol24h < 140) vol24h = 140;
+  btcDom += (Math.random() - 0.5) * 0.04;
+  btcDom  = Math.max(45, Math.min(58, btcDom));
+  fgIndex += (Math.random() - 0.5) * 0.3;
+  fgIndex  = Math.max(0, Math.min(100, fgIndex));
+  streamCount += Math.floor((Math.random() - 0.5) * 120);
+  streamCount  = Math.max(8000, Math.min(13000, streamCount));
+
+  document.getElementById('stat-mktcap').textContent = '$' + mktCap.toFixed(2) + 'T';
+  document.getElementById('stat-vol').textContent    = '$' + vol24h.toFixed(1) + 'B';
+  document.getElementById('stat-dom').textContent    = btcDom.toFixed(1) + '%';
+  document.getElementById('dom-bar').style.width     = btcDom + '%';
+  document.getElementById('stat-streams').textContent = streamCount.toLocaleString();
+
+  const fg    = Math.round(fgIndex);
+  document.getElementById('stat-fg').textContent = fg;
+  const fgLabels = ['Extreme Fear','Fear','Neutral','Greed','Extreme Greed'];
+  const li = fg < 20 ? 0 : fg < 40 ? 1 : fg < 60 ? 2 : fg < 80 ? 3 : 4;
+  document.getElementById('stat-fg-label').textContent = fgLabels[li];
+  const fgColors = ['#FF3355','#FF7730','#E8D44D','#00CC66','#00FF88'];
+  document.getElementById('stat-fg').style.color = fgColors[li];
+
+  renderFGDial(fg, fgColors[li]);
+}
+
+function renderFGDial(value, color) {
+  const svg   = document.getElementById('fg-dial');
+  const cx    = 18, cy = 18, r = 14;
+  const start = Math.PI;
+  const end   = start + (value / 100) * Math.PI;
+  const x1    = cx + r * Math.cos(start);
+  const y1    = cy + r * Math.sin(start);
+  const x2    = cx + r * Math.cos(end);
+  const y2    = cy + r * Math.sin(end);
+  const large = end - start > Math.PI ? 1 : 0;
+
+  svg.innerHTML = `
+    <path d="M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="#1A2030" stroke-width="4" stroke-linecap="round"/>
+    <path d="M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="${x2}" cy="${y2}" r="2.5" fill="${color}"/>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CANDLE UPDATES
+// ═══════════════════════════════════════════════════════════════════
+let currentCandleStartTimes = {};
+
+function initCurrentCandle() {
+  Object.keys(coins).forEach(sym => {
+    const last = candleHistory[sym][candleHistory[sym].length - 1];
+    currentCandleStartTimes[sym] = Date.now();
+    // Current (forming) candle is the last in the array
+  });
+}
+
+// Every 3000ms: close current candle, open new one
+function advanceCandles() {
+  Object.keys(coins).forEach(sym => {
+    const c    = coins[sym];
+    const hist = candleHistory[sym];
+    const last = hist[hist.length - 1];
+    // Close it
+    last.c = c.price;
+    // New candle
+    hist.push({
+      o: c.price,
+      h: c.price,
+      l: c.price,
+      c: c.price,
+      v: Math.random() * 0.6 + 0.1,
+      t: Date.now()
+    });
+    if (hist.length > CANDLE_COUNT) hist.shift();
+    // Update sparkline
+    sparkHistory[sym].push(c.price);
+    if (sparkHistory[sym].length > 20) sparkHistory[sym].shift();
+  });
+}
+
+// Every 200ms: update current candle high/low/close
+function tickCurrentCandle() {
+  Object.keys(coins).forEach(sym => {
+    const hist = candleHistory[sym];
+    const last = hist[hist.length - 1];
+    const c    = coins[sym];
+    last.c = c.price;
+    if (c.price > last.h) last.h = c.price;
+    if (c.price < last.l) last.l = c.price;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  WATCHLIST RE-SORT
+// ═══════════════════════════════════════════════════════════════════
+let sortTimer = 0;
+function maybeResortWatchlist() {
+  sortTimer++;
+  if (sortTimer >= 10) {
+    sortTimer = 0;
+    buildWatchlistRows();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RESPONSIVE CHART
+// ═══════════════════════════════════════════════════════════════════
+function setupResizeObserver() {
+  const container = document.getElementById('chart-svg-container');
+  if (!container) return;
+  const obs = new ResizeObserver(() => { renderChart(); });
+  obs.observe(container);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════════════════
+function boot() {
+  initTicker();
+  initTabs();
+  buildWatchlistRows();
+  renderChart();
+  updateChartHeader();
+  updateOrderBook();
+  updateFooterStats();
+  initCurrentCandle();
+  setupResizeObserver();
+
+  // 200ms: walk prices, update current candle, chart header, ticker
+  let tick200 = 0;
+  setInterval(() => {
+    walkAll();
+    tickCurrentCandle();
+    updateChartHeader();
+    updateTickerPrices();
+    updateWatchlistPrices();
+    tick200++;
+    // re-render chart every 200ms
+    renderChart();
+  }, 200);
+
+  // 400ms: order book
+  setInterval(() => {
+    updateOrderBook();
+  }, 400);
+
+  // 3000ms: advance candles, re-sort watchlist
+  setInterval(() => {
+    advanceCandles();
+    maybeResortWatchlist();
+  }, 3000);
+
+  // 1000ms: footer stats
+  setInterval(() => {
+    updateFooterStats();
+  }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>

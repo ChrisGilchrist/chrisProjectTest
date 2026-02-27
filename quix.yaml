@@ -21,6 +21,54 @@ deployments:
         required: true
         value: f1-data
     disabled: true
+  - name: Quix Pipeline Monitor
+    application: quix-pipeline-monitor
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: quix-pipeline-monitor
+    network:
+      ports:
+        - port: 80
+          targetPort: 8081
+    plugin:
+      embeddedView:
+        enabled: true
+        default: false
+      sidebarItem:
+        show: true
+        label: Pipeline Monitor
+        icon: insights
+        order: 4
+  - name: Crypto Stream Dashboard
+    application: crypto-stream-dashboard
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: crypto-stream-dashboard
+    network:
+      ports:
+        - port: 80
+          targetPort: 8081
+    plugin:
+      embeddedView:
+        enabled: true
+        default: false
+      sidebarItem:
+        show: true
+        label: Crypto Dashboard
+        icon: currency_bitcoin
+        order: 5
   - name: F1 Mercedes Dashboard
     application: f1-mercedes-dashboard
     version: latest

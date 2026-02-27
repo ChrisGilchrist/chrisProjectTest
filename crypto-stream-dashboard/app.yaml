@@ -1,0 +1,6 @@
+name: Crypto Stream Dashboard
+language: nodejs
+variables: []
+dockerfile: dockerfile
+runEntryPoint: main.js
+defaultFile: main.js

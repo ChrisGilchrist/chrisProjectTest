@@ -39,7 +39,7 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        default: false
+        default: true
       sidebarItem:
         show: true
         label: F1 Dashboard

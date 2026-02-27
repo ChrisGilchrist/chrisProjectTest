@@ -44,6 +44,10 @@ deployments:
         label: Pipeline Monitor
         icon: insights
         order: 4
+      globalItem:
+        show: true
+        icon: insights
+        order: 0
   - name: Crypto Stream Dashboard
     application: crypto-stream-dashboard
     version: latest

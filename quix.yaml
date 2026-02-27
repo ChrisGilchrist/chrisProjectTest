@@ -39,7 +39,6 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        default: false
       sidebarItem:
         show: true
         label: Pipeline Monitor
@@ -63,12 +62,15 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
-        default: false
       sidebarItem:
         show: true
         label: Crypto Dashboard
         icon: currency_bitcoin
         order: 5
+      globalItem:
+        show: true
+        icon: rocket_launch
+        order: 0
   - name: F1 Mercedes Dashboard
     application: f1-mercedes-dashboard
     version: latest

@@ -39,6 +39,7 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
+        default: true
       sidebarItem:
         show: true
         label: Pipeline Monitor

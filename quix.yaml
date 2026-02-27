@@ -66,6 +66,7 @@ deployments:
     plugin:
       embeddedView:
         enabled: true
+        default: true
       sidebarItem:
         show: true
         label: Crypto Dashboard

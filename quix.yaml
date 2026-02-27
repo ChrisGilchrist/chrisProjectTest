@@ -45,6 +45,9 @@ deployments:
         label: F1 Dashboard
         icon: speed
         order: 3
+      globalItem:
+        show: true
+        order: 0
   - name: ProjectOne
     application: projectone
     version: latest

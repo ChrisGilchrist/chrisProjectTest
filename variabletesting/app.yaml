@@ -1,0 +1,51 @@
+name: VariableTesting
+language: python
+variables:
+  - name: input
+    inputType: InputTopic
+    multiline: false
+    description: Name of the input topic to listen to.
+    defaultValue: input_topic
+  - name: output
+    inputType: OutputTopic
+    multiline: false
+    description: Name of the output topic to write to.
+    defaultValue: output-topic
+  - name: FreeText
+    inputType: FreeText
+    multiline: false
+    defaultValue: FreeText value
+  - name: MultiLine
+    inputType: FreeText
+    multiline: true
+    defaultValue: |
+      MultiLine value
+  - name: Options
+    inputType: Options
+    multiline: false
+    description: jjj
+    defaultValue: Different222
+    options:
+      - label: hellooooo
+        value: hellooooo
+      - label: Patrick
+        value: Patrick222
+      - label: Same
+        value: Same
+      - label: Different
+        value: Different222
+  - name: secret
+    inputType: Secret
+    multiline: false
+    description: kkk
+    defaultValue: INFLUXDB_ADMIN_TOKEN
+    required: true
+  - name: k
+    inputType: FreeText
+    multiline: false
+    description: k
+    defaultValue: kk
+dockerfile: dockerfile
+runEntryPoint: main.py
+defaultFile: main.py
+libraryItemId: starter-transformation

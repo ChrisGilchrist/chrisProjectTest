@@ -55,18 +55,15 @@ deployments:
       replicas: 1
     publicAccess:
       enabled: true
-      urlPrefix: projectone-47480d2
-    network:
-      ports:
-        - port: 80
-          targetPort: 8081
+      urlPrefix: qdrant-qdrant-v1-8-3t
     plugin:
       embeddedView:
         enabled: true
+        hideHeader: true
         default: true
       sidebarItem:
         show: true
-        label: Frontend123
+        label: Fron
         icon: save
         order: 2
       globalItem:
@@ -76,14 +73,11 @@ deployments:
   - name: Basic Angular App
     application: angular-starter-template
     version: latest
-    deploymentType: Service
+    deploymentType: Job
     resources:
       cpu: 200
       memory: 500
       replicas: 1
-    publicAccess:
-      enabled: true
-      urlPrefix: basicangularapp-38dc9ea
     variables:
       - name: input
         inputType: InputTopic
@@ -94,30 +88,6 @@ deployments:
         inputType: FreeText
         description: ''
         value: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlpXeUJqWTgzcXotZW1pUlZDd1I4dyJ9.eyJpc3MiOiJodHRwczovL2F1dGguZGV2LnF1aXguYWkvIiwic3ViIjoiYXV0aDB8MjE5MWU0YjYtYzc0MC00ZWUyLTlmOTUtYTExNWQyNzBhNWMwIiwiYXVkIjpbImh0dHBzOi8vcG9ydGFsLWFwaS5kZXYucXVpeC5haS8iLCJodHRwczovL3F1aXgtZGV2LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3NjQ3NjgyODMsImV4cCI6MTc2NzM2MDI4Mywic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF6cCI6IjYwNEE5cTVWb2NZb3ZvTlBvTWlqdWVVWmNFSEljbE1zIiwicGVybWlzc2lvbnMiOltdfQ.sdJuHgmDiAhJHv5eEam6NsAJbNnU_BXRbMPpdv76LXj5ymHigmjKAa4PbP1SQFjEVPKl-O9y9p1oO8CLxIesvMKErV28lrpJ7ku75AqVP8_ASCtFj2v6ee1jeLTUnWcw_3I_UJ5FuFau4Ofwkj_rHbJb2yOF4OH2wfh8Mz_A4ciliPdnQhMwALKZRZvePxgDydQUi4xeZK_1CTKZV3ukRUBeD-vhK6lNrF12IMYOQJgfNTC6O2472Iz5b4IbWsADC1Nd-uFM8lAtT0EWjI_PY8DizF9uJtT4aNrNsN4pUxZbQiIgXbct0m5Y3Ay58t35efGngNBT03q5oAHPLmyjwg
-  - name: Dynamic Configuration Managerk
-    application: DynamicConfiguration
-    version: 20251003.1-2025-10-user-flow
-    deploymentType: Managed
-    resources:
-      cpu: 500
-      memory: 1000
-      replicas: 1
-    publicAccess:
-      enabled: true
-      urlPrefix: config-api-svc
-    configuration:
-      topic: first_topic
-      mongoHost: jdgdfgdf
-      mongoPort: jkkkkkkkkk
-      mongoUser: jtuyt
-      mongoPasswordSecret: INFLUX_ADMIN_TOKEN
-      mongoDatabase: jtyutuy
-      mongoCollection: juytuytt
-      workers: 1ytyu
-    plugin:
-      embeddedView:
-        enabled: true
-        default: true
   - name: Demo Data Source 2
     application: demo-data-source-2
     version: latest
@@ -142,6 +112,9 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: qdrant-qdrant-v1-8-3
+    state:
+      enabled: true
+      size: 3
     network:
       serviceName: qdrant
       ports:
@@ -166,21 +139,164 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: ingestion-api-c7f9695
+    state:
+      enabled: true
+      size: 1
     network:
       ports:
         - port: 80
           targetPort: 3000
+  - name: VariableTesting
+    application: variabletesting
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    state:
+      enabled: true
+      size: 1
+      path: /app/state/patrick
     variables:
       - name: input
         inputType: InputTopic
-        description: This is the input topic to read data from
-        required: true
-        value: first_topic
+        description: Name of the input topic to listen to.
+        value: ''
       - name: output
         inputType: OutputTopic
-        description: This is the output topic to write data to
-        required: true
+        description: Name of the output topic to write to.
+        value: f1-data-2
+      - name: FreeText
+        inputType: FreeText
+        value: FreeText value
+      - name: MultiLine
+        inputType: FreeText
+        multiline: true
+        value: |
+          MultiLine value
+      - name: Options
+        inputType: Options
+        value: hellooooo
+      - name: secret
+        inputType: Secret
+        secretKey: ADMIN_PASSWORD
+      - name: k
+        inputType: FreeText
+        description: k
+        value: kk
+  - name: Quix DataLake Sink
+    application: DataLake.Sink
+    version: latest
+    deploymentType: Managed
+    resources:
+      cpu: 500
+      memory: 1500
+      replicas: 1
+    configuration:
+      topic: first_topic
+      indexRowCount: 100022
+  - name: VariableTesting 2
+    application: variabletesting
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    state:
+      enabled: true
+      size: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        value: input_topic
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
         value: output-topic
+      - name: FreeText
+        inputType: FreeText
+        value: FreeText value
+      - name: MultiLine
+        inputType: FreeText
+        multiline: true
+        value: |
+          MultiLine value
+      - name: Options
+        inputType: Options
+        description: jjj
+        value: Patrick222
+      - name: secret
+        inputType: Secret
+        description: kkk
+        required: true
+        secretKey: kkkk
+      - name: k
+        inputType: FreeText
+        description: k
+        value: kk
+  - name: VariableTesting 3
+    application: variabletesting
+    version: d43524740c92aee2e8edaf9bd8481c571f4e253d
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: input
+        inputType: InputTopic
+        description: Name of the input topic to listen to.
+        value: input_topic
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write to.
+        value: output-topic
+      - name: FreeText
+        inputType: FreeText
+        value: FreeText value
+      - name: MultiLine
+        inputType: FreeText
+        multiline: true
+        value: |
+          MultiLine value
+      - name: Options
+        inputType: Options
+        description: jjj
+        value: Different222
+      - name: secret
+        inputType: Secret
+        secretKey: ADMIN_PASSWORD
+      - name: k
+        inputType: FreeText
+        description: k
+        value: kk
+  - name: Dynamic Configuration Manager
+    application: DynamicConfiguration
+    version: 20251003.1-2025-10-user-flow
+    deploymentType: Managed
+    resources:
+      cpu: 500
+      memory: 1000
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: config-api-svc
+    configuration:
+      topic: first_topic
+      mongoHost: jdgdfgdf
+      mongoPort: jkkkkkkkkk
+      mongoUser: jtuyt
+      mongoPasswordSecret: INFLUX_ADMIN_TOKEN
+      mongoDatabase: jtyutuy
+      mongoCollection: juytuytt
+      workers: 1ytyu
+    plugin:
+      embeddedView:
+        enabled: true
+        default: true
 
 # This section describes the Topics of the data pipeline
 topics:
@@ -188,3 +304,6 @@ topics:
   - name: hello-world-source
   - name: j
   - name: output-topic
+  - name: f1-data
+  - name: input_topic
+  - name: f1-data-2

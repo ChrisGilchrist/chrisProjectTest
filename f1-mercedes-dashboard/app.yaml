@@ -1,0 +1,6 @@
+name: F1 Mercedes Dashboard
+language: nodejs
+variables: []
+dockerfile: dockerfile
+runEntryPoint: main.js
+defaultFile: main.js

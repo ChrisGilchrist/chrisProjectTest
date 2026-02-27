@@ -1,0 +1,130 @@
+<!-- MkDocs Documentation Search Component -->
+<div class="search-container">
+
+  <!-- Header -->
+  <div class="search-header">
+    <h2>Search Quix Documentation</h2>
+
+    <!-- Index Status -->
+    <p *ngIf="indexReady" class="doc-count">
+      <span class="status-icon">✓</span>
+      {{ documentCount }} documents indexed
+    </p>
+
+    <p *ngIf="!indexReady && !loadError" class="loading-index">
+      <span class="spinner">⟳</span>
+      Loading search index...
+    </p>
+
+    <p *ngIf="loadError" class="error-message">
+      <span class="error-icon">✗</span>
+      {{ loadError }}
+      <button (click)="reloadIndex()" class="retry-btn">Retry</button>
+    </p>
+  </div>
+
+  <!-- Search Input -->
+  <div class="search-input-wrapper">
+    <span class="search-icon">🔍</span>
+    <input
+      type="text"
+      [formControl]="searchControl"
+      placeholder="Search documentation... (e.g., 'streams', 'kafka', 'authentication')"
+      class="search-input"
+      [disabled]="!indexReady"
+      autocomplete="off"
+    />
+    <span *ngIf="loading" class="loading-spinner">⟳</span>
+    <button
+      *ngIf="searchControl.value"
+      (click)="searchControl.setValue('')"
+      class="clear-btn"
+      title="Clear search"
+    >
+      ✕
+    </button>
+  </div>
+
+  <!-- Search Status -->
+  <div *ngIf="loading" class="loading-message">
+    Searching...
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="results.length > 0" class="results">
+    <p class="result-count">
+      <strong>{{ results.length }}</strong> result{{ results.length === 1 ? '' : 's' }} found
+    </p>
+
+    <div
+      *ngFor="let result of results; let i = index"
+      class="result-item"
+      (click)="openDoc(result.url)"
+      [attr.data-index]="i"
+    >
+      <!-- Result Title -->
+      <h3
+        class="result-title"
+        [innerHTML]="highlightQuery(result.title, searchControl.value || '')"
+      ></h3>
+
+      <!-- Result Snippet -->
+      <p
+        class="result-snippet"
+        [innerHTML]="highlightQuery(result.snippet, searchControl.value || '')"
+      ></p>
+
+      <!-- Result Metadata -->
+      <div class="result-meta">
+        <span class="result-location">{{ result.location }}</span>
+        <span class="result-score" [title]="'Relevance score: ' + result.score">
+          {{ formatScore(result.score) }}% match
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Results -->
+  <div
+    *ngIf="!loading && searchControl.value && searchControl.value.length >= 2 && results.length === 0 && indexReady"
+    class="no-results"
+  >
+    <div class="no-results-icon">🔍</div>
+    <p class="no-results-message">
+      No results found for <strong>"{{ searchControl.value }}"</strong>
+    </p>
+    <p class="no-results-suggestion">
+      Try different keywords or check your spelling
+    </p>
+    <div class="search-tips">
+      <p><strong>Search tips:</strong></p>
+      <ul>
+        <li>Use simple, common words</li>
+        <li>Try related terms (e.g., "stream" instead of "streaming")</li>
+        <li>Search for specific features or API names</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Empty State (before search) -->
+  <div
+    *ngIf="!loading && (!searchControl.value || searchControl.value.length < 2) && indexReady"
+    class="empty-state"
+  >
+    <div class="empty-icon">📚</div>
+    <p class="empty-message">Start typing to search the Quix documentation</p>
+    <div class="example-searches">
+      <p><strong>Popular searches:</strong></p>
+      <div class="example-chips">
+        <button
+          *ngFor="let example of ['Quix Streams', 'Kafka', 'API', 'Authentication', 'Deployment']"
+          (click)="searchControl.setValue(example)"
+          class="example-chip"
+        >
+          {{ example }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

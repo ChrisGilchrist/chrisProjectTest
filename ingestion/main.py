@@ -275,27 +275,27 @@ def ingest_docs():
     from qdrant_client import QdrantClient
     from qdrant_client.models import Distance, VectorParams, PointStruct
 
-    log.info("Starting documentation ingestion...")
+    log.info("🚀 Ingestion service starting")
 
     # Connect to Qdrant
-    log.info(f"Connecting to Qdrant at {QDRANT_URL}")
+    log.info(f"🔌 Connecting to Qdrant at {QDRANT_URL}")
     client = QdrantClient(url=QDRANT_URL)
 
     # Delete existing collection (fresh start)
     try:
         client.delete_collection(collection_name=COLLECTION)
-        log.info(f"Deleted existing collection: {COLLECTION}")
+        log.info(f"🗑️  Deleted existing collection: {COLLECTION}")
     except Exception as e:
-        log.info(f"Collection {COLLECTION} doesn't exist yet (this is fine)")
+        log.info(f"✅ Collection {COLLECTION} doesn't exist yet (this is fine)")
 
     # Load embedding model
-    log.info(f"Loading embedding model: {MODEL_NAME}")
+    log.info(f"🧠 Loading embedding model: {MODEL_NAME}")
     model = SentenceTransformer(MODEL_NAME)
     vector_size = model.get_sentence_embedding_dimension()
-    log.info(f"Model loaded. Vector size: {vector_size}")
+    log.info(f"✅ Model loaded. Vector size: {vector_size}")
 
     # Create collection
-    log.info(f"Creating collection: {COLLECTION}")
+    log.info(f"📦 Creating collection: {COLLECTION}")
     client.create_collection(
         collection_name=COLLECTION,
         vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
@@ -303,7 +303,7 @@ def ingest_docs():
 
     # Walk through all markdown files
     md_files = list(DOCS_ROOT.rglob("*.md"))
-    log.info(f"Found {len(md_files)} markdown files to process")
+    log.info(f"📄 Found {len(md_files)} markdown files to process")
 
     points = []
     total_sections = 0
@@ -311,7 +311,7 @@ def ingest_docs():
 
     for md_file in md_files:
         try:
-            log.info(f"Processing: {md_file.relative_to(DOCS_ROOT)}")
+            log.info(f"➡️ Processing {files_processed+1}/{len(md_files)}: {md_file.relative_to(DOCS_ROOT)}")
 
             # Read and parse file
             md_content = read_markdown(md_file)
@@ -321,15 +321,12 @@ def ingest_docs():
             doc_title = metadata.get('title', md_file.stem.replace('-', ' ').title())
             doc_description = metadata.get('description', '')
 
-            log.info(f"  Title: '{doc_title}'")
-            log.info(f"  Description: {len(doc_description)} chars")
-
             # Extract sections
             sections = extract_sections(clean_content, metadata)
-            log.info(f"  Extracted {len(sections)} sections")
+            log.info(f"✂️ {len(sections)} sections created")
 
             # Create search payloads for each section
-            for idx, section in enumerate(sections):
+            for section in sections:
                 section_heading = section.get('heading')
                 section_text = section.get('text', '')
                 section_slug = heading_to_slug(section_heading) if section_heading else None
@@ -362,30 +359,28 @@ def ingest_docs():
                 points.append(point)
                 total_sections += 1
 
-                log.info(f"    Section {idx+1}: '{section_heading or '(page-level)'}' ({len(section_text)} chars)")
-
             files_processed += 1
 
             # Batch upsert every 100 points
             if len(points) >= 100:
                 client.upsert(collection_name=COLLECTION, points=points)
-                log.info(f"Indexed batch of {len(points)} sections")
+                log.info(f"✅ Indexed batch of {len(points)} sections")
                 points = []
 
         except Exception as e:
-            log.error(f"Failed to process {md_file}: {e}")
+            log.error(f"❌ Failed to process {md_file}: {e}")
             log.error(traceback.format_exc())
             continue
 
     # Upsert remaining points
     if points:
         client.upsert(collection_name=COLLECTION, points=points)
-        log.info(f"Indexed final batch of {len(points)} sections")
+        log.info(f"✅ Indexed final batch of {len(points)} sections")
 
     log.info("="*70)
-    log.info(f"Ingestion complete!")
-    log.info(f"  Files processed: {files_processed}/{len(md_files)}")
-    log.info(f"  Total sections indexed: {total_sections}")
+    log.info("🎉 Ingestion complete!")
+    log.info(f"📊 Files processed: {files_processed}/{len(md_files)}")
+    log.info(f"📊 Total sections indexed: {total_sections}")
     log.info("="*70)
 
 # -------------------------------
@@ -396,9 +391,9 @@ if __name__ == "__main__":
     try:
         ingest_docs()
     except KeyboardInterrupt:
-        log.info("Ingestion interrupted by user")
+        log.info("🛑 Ingestion interrupted by user")
         sys.exit(0)
     except Exception as e:
-        log.error(f"Ingestion failed: {e}")
+        log.error(f"❌ Ingestion failed: {e}")
         log.error(traceback.format_exc())
         sys.exit(1)

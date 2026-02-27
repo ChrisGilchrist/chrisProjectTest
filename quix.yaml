@@ -69,7 +69,7 @@ deployments:
         order: 5
       globalItem:
         show: true
-        icon: rocket_launch
+        icon: currency_bitcoin
         order: 0
   - name: F1 Mercedes Dashboard
     application: f1-mercedes-dashboard

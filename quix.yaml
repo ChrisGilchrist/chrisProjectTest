@@ -25,14 +25,14 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 1000
+      cpu: 10001
       memory: 8000
       replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: influxdb
     network:
-      serviceName: influxdb
+      serviceName: influxdbk
       ports:
         - port: 80
           targetPort: 8086

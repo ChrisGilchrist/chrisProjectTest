@@ -42,7 +42,7 @@ deployments:
         description: Admin username to initialize InfluxDB with
         required: true
         value: admin
-      - name: INFLUXDB_ADMIN_PASSWORD
+      - name: INFLUXDB_ADMIN_PASSWORD_2847242378
         inputType: Secret
         description: Admin password to initialize InfluxDB with
         required: true

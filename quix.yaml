@@ -11,14 +11,14 @@ deployments:
     version: latest
     deploymentType: Job
     resources:
-      cpu: 200
+      cpu: 2001
       memory: 200
       replicas: 1
     variables:
       - name: output
         inputType: OutputTopic
         description: Name of the output topic to write into
-        required: true
+        required: false
         value: f1-data
   - name: InfluxDB v1
     application: influxdb-v1

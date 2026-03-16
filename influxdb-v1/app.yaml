@@ -1,0 +1,20 @@
+name: influxdb-v1
+language: docker
+variables:
+  - name: INFLUXDB_ADMIN_USER
+    inputType: FreeText
+    description: Admin username to initialize InfluxDB with
+    defaultValue: admin
+    required: true
+  - name: INFLUXDB_ADMIN_PASSWORD
+    inputType: Secret
+    description: Admin password to initialize InfluxDB with
+    defaultValue: kkkk
+    required: true
+  - name: INFLUXDB_DB
+    inputType: FreeText
+    description: Database name to initialize InfluxDB with
+    defaultValue: quix
+dockerfile: dockerfile
+defaultFile: dockerfile
+libraryItemId: influxdb1

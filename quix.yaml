@@ -51,6 +51,38 @@ deployments:
         inputType: FreeText
         description: Database name to initialize InfluxDB with
         value: quix
+  - name: InfluxDB v2
+    application: influxdb-v1
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 10001
+      memory: 8000
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: influxdb
+    network:
+      serviceName: influxdbk
+      ports:
+        - port: 80
+          targetPort: 8086
+    variables:
+      - name: INFLUXDB_ADMIN_USER_r7er67e
+        inputType: FreeText
+        description: Admin username to initialize InfluxDB with
+        required: true
+        value: admin
+      - name: INFLUXDB_ADMIN_PASSWORD_2847242378
+        inputType: Secret
+        description: Admin password to initialize InfluxDB with
+        required: true
+        secretKey: kkkk333
+      - name: INFLUXDB_DB
+        inputType: FreeText
+        description: Database name to initialize InfluxDB with
+        value: quix
+    
 
 # This section describes the Topics of the data pipeline
 topics:

@@ -46,7 +46,7 @@ deployments:
         inputType: Secret
         description: Admin password to initialize InfluxDB with
         required: true
-        secretKey: kkkk
+        secretKey: kkkk333
       - name: INFLUXDB_DB
         inputType: FreeText
         description: Database name to initialize InfluxDB with

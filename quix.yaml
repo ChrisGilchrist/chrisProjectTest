@@ -236,14 +236,17 @@ deployments:
           MultiLine value
       - name: Options
         inputType: Options
+        description: jjj
         value: hellooooo
       - name: secret
         inputType: Secret
-        secretKey: ADMIN_PASSWORD
+        description: kkk
+        required: true
+        secretKey: kkkk
       - name: k
         inputType: FreeText
         description: k
-        value: kk
+        value: kk222
   - name: Quix DataLake Sink
     application: DataLake.Sink
     version: latest

@@ -11,7 +11,9 @@ variables:
     defaultValue: main.py
   - name: ANTHROPIC_API_KEY
     inputType: Secret
+    multiline: false
     description: Token generated from https://platform.claude.com/settings/keys.
+    defaultValue: kkkk
 dockerfile: dockerfile
 defaultFile: dockerfile
 libraryItemId: marimo

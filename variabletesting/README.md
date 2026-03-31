@@ -1,36 +1,69 @@
-# Starter transformation
 
-[This code sample](https://github.com/quixio/quix-samples/tree/main/python/transformations/starter_transformation) demonstrates how to consume and transform data from a Kafka topic
-and publish these results to another Kafka topic, all using our `StreamingDataFrame`.
+This is the top-level introduction to the project.
 
-This boilerplate will run in Quix Cloud but largely has placeholder operations, so you 
-will need to add your own to do something besides printing the data to console!
+## Installation
 
-## How to run
+Steps to get started with the project.
 
-Create a [Quix](https://portal.cloud.quix.io/signup?utm_campaign=github) account or log-in and visit the Samples to use this project.
+### Prerequisites
 
-Clicking `Edit code` on the Sample, forks the project to your own Git repo so you can customize it before deploying.
+Make sure you have the following installed:
 
-## Environment variables
+- Node.js 18+
+- Angular CLI
 
-The code sample uses the following environment variables:
+### Step-by-Step Guide
 
-- **input**: Name of the input topic to listen to.
-- **output**: Name of the output topic to write to.
+Follow these steps carefully.
 
-## Possible `StreamingDataFrame` Operations
+#### Windows
 
-Many different operations and transformations are available, so 
-be sure to [explore what's possible](https://quix.io/docs/quix-streams/processing.html)!
+Use the installer from the website.
 
+#### macOS
 
-## Contribute
+Use Homebrew to install dependencies.
 
-Submit forked projects to the Quix [GitHub](https://github.com/quixio/quix-samples) repo. Any new project that we accept will be attributed to you and you'll receive $200 in Quix credit.
+## Configuration
 
-## Open source
+How to configure the application.
 
-This project is open source under the Apache 2.0 license and available in our [GitHub](https://github.com/quixio/quix-samples) repo.
+### Environment Variables
 
-Please star us and mention us on social to show your appreciation.
+Set up your `.env` file with the required values.
+
+### Database Setup
+
+Connect to your database instance.
+
+## Features
+
+What's included in this release.
+
+### Authentication
+
+OAuth2 and JWT support out of the box.
+
+#### Social Login
+
+Google, GitHub, and Microsoft providers.
+
+### Dashboard
+
+Real-time data visualization widgets.
+
+## Troubleshooting
+
+Common issues and how to fix them.
+
+### CORS Issues
+
+Check your API gateway configuration.
+
+### Build Failures
+
+Clear the cache and rebuild.
+
+## Contributing
+
+Guidelines for contributing to the project.

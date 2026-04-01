@@ -45,6 +45,10 @@ variables:
     multiline: false
     description: k
     defaultValue: kk
+  - name: cc
+    inputType: InputTopic
+    multiline: false
+    defaultValue: first_topic
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

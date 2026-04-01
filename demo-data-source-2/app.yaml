@@ -10,6 +10,9 @@ variables:
     inputType: InputTopic
     multiline: false
     defaultValue: input_topic
+  - name: k
+    inputType: InputTopic
+    multiline: false
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

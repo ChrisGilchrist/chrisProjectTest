@@ -7,6 +7,10 @@ variables:
     description: Name of the output topic to write into
     defaultValue: f1-data-2
     required: true
+  - name: ff
+    inputType: InputTopic
+    multiline: false
+    defaultValue: first_topic
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

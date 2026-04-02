@@ -3,8 +3,9 @@ language: docker
 variables:
   - name: POSTGRES_USER
     inputType: FreeText
+    multiline: false
     description: The root username to initialize PostgreSQL with
-    defaultValue: admin
+    defaultValue: adminjj
     required: true
   - name: POSTGRES_PASSWORD
     inputType: Secret

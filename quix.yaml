@@ -101,6 +101,7 @@ deployments:
         label: F1 Dashboard
         icon: speed
         order: 3
+        badge: BETA
       globalItem:
         show: true
         order: 0

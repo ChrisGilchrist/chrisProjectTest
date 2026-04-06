@@ -13,10 +13,6 @@ variables:
     inputType: OutputTopic
     multiline: false
     defaultValue: ghf
-  - name: gd
-    inputType: InputTopic
-    multiline: false
-    defaultValue: f1-data
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

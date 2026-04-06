@@ -1,14 +1,18 @@
-name: hhh
+name: kk
 language: python
 variables:
   - name: input
     inputType: InputTopic
     description: Name of the input topic to listen to.
     defaultValue: csv-data
-  - name: output
+  - name: chfid
+    inputType: InputTopic
+    multiline: false
+    defaultValue: hello-world-source
+  - name: fgf
     inputType: OutputTopic
-    description: Name of the output topic to write to.
-    defaultValue: transform
+    multiline: false
+    defaultValue: ghf
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

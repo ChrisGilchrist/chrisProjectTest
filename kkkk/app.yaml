@@ -13,6 +13,10 @@ variables:
     inputType: OutputTopic
     multiline: false
     defaultValue: ghf
+  - name: egds
+    inputType: FreeText
+    multiline: false
+    defaultValue: dfg
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

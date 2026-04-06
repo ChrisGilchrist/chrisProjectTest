@@ -13,6 +13,10 @@ variables:
     inputType: InputTopic
     multiline: false
     defaultValue: hello-world-source
+  - name: fgf
+    inputType: OutputTopic
+    multiline: false
+    defaultValue: ghf
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

@@ -375,7 +375,7 @@ deployments:
         value: csv-data
       - name: chfid
         inputType: InputTopic
-        value: hello-world-source
+        value: f1-data
       - name: fgf
         inputType: OutputTopic
         value: ghf

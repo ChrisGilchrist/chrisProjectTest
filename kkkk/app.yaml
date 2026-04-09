@@ -22,4 +22,6 @@ runEntryPoint: main.py
 defaultFile: main.py
 libraryItemId: starter-transformation
 includedFolders:
-  - angular-starter-template/src/app
+  - angular-starter-template/public
+  - angular-starter-template/src/app/components/active-streams
+  - angular-starter-template/src/assets

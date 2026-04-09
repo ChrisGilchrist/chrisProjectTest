@@ -360,7 +360,6 @@ deployments:
       embeddedView:
         enabled: true
         default: true
-    disabled: true
   - name: kk
     application: kkkk
     version: latest

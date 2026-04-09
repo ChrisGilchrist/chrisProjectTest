@@ -22,4 +22,4 @@ runEntryPoint: main.py
 defaultFile: main.py
 libraryItemId: starter-transformation
 includedFolders:
-  - angular-starter-template
+  - angular-starter-template/src/app

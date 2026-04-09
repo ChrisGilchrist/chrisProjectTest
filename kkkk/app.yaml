@@ -22,6 +22,4 @@ runEntryPoint: main.py
 defaultFile: main.py
 libraryItemId: starter-transformation
 includedFolders:
-  - angular-starter-template
-  - crypto-stream-dashboard
-  - ingestion/quix-docs-main/.github
+  - ingestion

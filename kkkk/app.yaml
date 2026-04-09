@@ -24,3 +24,4 @@ libraryItemId: starter-transformation
 includedFolders:
   - angular-starter-template
   - crypto-stream-dashboard
+  - ingestion/quix-docs-main/.github

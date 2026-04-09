@@ -1,11 +1,11 @@
 # import the Quix Streams modules for interacting with Kafka.
 # For general info, see https://quix.io/docs/quix-streams/introduction.html
-from quixstreams import Application
-
 import os
 
 # for local dev, load env vars from a .env file
 from dotenv import load_dotenv
+from quixstreams import Application
+
 load_dotenv()
 
 
@@ -27,7 +27,7 @@ def main():
     app = Application(
         consumer_group="my_transformation",
         auto_create_topics=True,
-        auto_offset_reset="earliest"
+        auto_offset_reset="earliest",
     )
     input_topic = app.topic(name=os.environ["input"])
     output_topic = app.topic(name=os.environ["output"])

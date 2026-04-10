@@ -360,6 +360,10 @@ deployments:
       embeddedView:
         enabled: true
         default: true
+      globalItem:
+        show: true
+        icon: pin_drop
+        order: 0
   - name: kk
     application: kkkk
     version: latest

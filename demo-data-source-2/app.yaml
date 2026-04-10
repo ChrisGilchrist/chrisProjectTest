@@ -10,10 +10,10 @@ variables:
     inputType: InputTopic
     multiline: false
     defaultValue: input_topic
+  - name: ddfdsf
+    inputType: InputTopic
+    multiline: false
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py
 libraryItemId: demo-data-source
-includedFolders:
-  - demo-data-source-2
-  - demo-data-source-3

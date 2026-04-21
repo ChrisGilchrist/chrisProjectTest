@@ -1,4 +1,4 @@
-name: VariableTesting
+name: VariableTesting2
 language: python
 variables:
   - name: input

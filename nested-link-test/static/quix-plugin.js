@@ -2,18 +2,19 @@
   const QuixPlugin = {
 
     _log: function (emoji, label, data) {
-      const style = 'background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;';
+      const badge = 'background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;';
+      const text = 'color: #1976d2; font-weight: bold;';
       if (data !== undefined) {
-        console.log('%c QuixPlugin %c ' + emoji + ' ' + label, style, 'color: #1976d2; font-weight: bold;', data);
+        console.log('%c QuixPlugin %c ' + emoji + ' ' + label, badge, text, data);
       } else {
-        console.log('%c QuixPlugin %c ' + emoji + ' ' + label, style, 'color: #1976d2; font-weight: bold;');
+        console.log('%c QuixPlugin %c ' + emoji + ' ' + label, badge, text);
       }
     },
 
     // ── Navigation ──────────────────────────────────────────
     _syncRoute: function () {
       const path = window.location.pathname;
-      QuixPlugin._log('📍', 'Sending navigate →', path);
+      QuixPlugin._log('📍', 'navigate →', path);
       window.parent.postMessage({ type: 'navigate', path: path }, '*');
     },
 
@@ -25,7 +26,7 @@
       history.replaceState = function (...args) { replace(...args); QuixPlugin._syncRoute(); };
 
       window.addEventListener('popstate', () => QuixPlugin._syncRoute());
-      QuixPlugin._log('🧭', 'Navigation sync initialised');
+      QuixPlugin._log('🧭', 'Navigation sync ready');
       QuixPlugin._syncRoute();
     },
 
@@ -38,7 +39,7 @@
     },
 
     _handleToken: function (token) {
-      QuixPlugin._log('🔑', 'AUTH_TOKEN received', token.substring(0, 40) + '...');
+      QuixPlugin._log('🔑', 'Token received', token.substring(0, 40) + '...');
       this._tokenCallbacks.forEach(fn => fn(token));
     },
 
@@ -48,13 +49,13 @@
         QuixPlugin._handleToken(event.data.token);
       }
       window.addEventListener('message', messageHandler);
-      QuixPlugin._log('🔐', 'Requesting auth token from parent...');
+      QuixPlugin._log('🔐', 'Requesting token from parent...');
       window.parent.postMessage({ type: 'REQUEST_AUTH_TOKEN' }, '*');
     },
 
     // ── Init ─────────────────────────────────────────────────
     init: function () {
-      console.group('%c QuixPlugin SDK ', 'background: #1976d2; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold;');
+      console.group('%c QuixPlugin SDK ', 'background: #1976d2; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 11px;');
       QuixPlugin._log('🚀', 'Initialising...');
       this._initNavigation();
       this._initToken();

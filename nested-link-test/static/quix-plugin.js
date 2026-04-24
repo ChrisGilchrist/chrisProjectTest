@@ -4,11 +4,16 @@
     _log: function (emoji, label, data) {
       const badge = 'background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;';
       const text = 'color: #1976d2; font-weight: bold;';
+
+      // Log inside iframe context
       if (data !== undefined) {
         console.log('%c QuixPlugin %c ' + emoji + ' ' + label, badge, text, data);
       } else {
         console.log('%c QuixPlugin %c ' + emoji + ' ' + label, badge, text);
       }
+
+      // Relay to parent so it shows in the main page console
+      window.parent.postMessage({ type: 'quixplugin-log', emoji: emoji, label: label, data: data }, '*');
     },
 
     // ── Navigation ──────────────────────────────────────────

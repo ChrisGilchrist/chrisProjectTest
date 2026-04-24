@@ -2,12 +2,11 @@
   var VERSION = '1.0.0';
 
   var styles = {
-    badge:    'background: #6C63FF; color: #fff; padding: 2px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px;',
-    version:  'color: #999; font-size: 10px;',
-    success:  'color: #22c55e; font-weight: 600;',
-    info:     'color: #6C63FF; font-weight: 600;',
-    muted:    'color: #888; font-size: 11px;',
-    data:     'color: #f59e0b; font-weight: 600;',
+    badge:   'background: #0064ff; color: #fff; padding: 2px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px;',
+    version: 'color: #999; font-size: 10px;',
+    success: 'color: #22c55e; font-weight: 600;',
+    info:    'color: #0064ff; font-weight: 600;',
+    muted:   'color: #888; font-size: 11px;',
   };
 
   function log(level, message, data) {
@@ -17,11 +16,12 @@
     } else {
       console.log('%c Quix %c ' + message, styles.badge, style);
     }
-    // Relay structured event to parent portal
     window.parent.postMessage({ type: 'quixplugin-log', level: level, message: message, data: data }, '*');
   }
 
   var QuixPlugin = {
+
+    _groupOpen: false,
 
     // ── Navigation ──────────────────────────────────────────
     _syncRoute: function () {
@@ -51,6 +51,11 @@
 
     _handleToken: function (token) {
       log('success', '✓ Auth token received', token.substring(0, 20) + '••••');
+      // Close the init group now that async token has arrived
+      if (QuixPlugin._groupOpen) {
+        console.groupEnd();
+        QuixPlugin._groupOpen = false;
+      }
       this._tokenCallbacks.forEach(function (fn) { fn(token); });
     },
 
@@ -71,11 +76,12 @@
         styles.badge,
         styles.version
       );
+      QuixPlugin._groupOpen = true;
       log('info',    '◎ Initialising');
       this._initNavigation();
       this._initToken();
       log('success', '✓ Ready');
-      console.groupEnd();
+      // NOTE: groupEnd() is intentionally deferred — called in _handleToken once token arrives
       return this;
     }
 

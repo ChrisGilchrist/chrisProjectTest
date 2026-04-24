@@ -2,23 +2,6 @@ from flask import Flask, send_from_directory
 
 app = Flask(__name__, static_folder='static')
 
-PARENT_LOG_RELAY = """
-<script>
-  // Relay QuixPlugin logs from iframe to parent console
-  window.addEventListener('message', function(event) {
-    if (event.data && event.data.type === 'quixplugin-log') {
-      var badge = 'background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;';
-      var text = 'color: #1976d2; font-weight: bold;';
-      var msg = '%c QuixPlugin (iframe) %c ' + event.data.emoji + ' ' + event.data.label;
-      if (event.data.data !== undefined) {
-        console.log(msg, badge, text, event.data.data);
-      } else {
-        console.log(msg, badge, text);
-      }
-    }
-  });
-</script>
-"""
 
 @app.route('/quix-plugin.js')
 def sdk():

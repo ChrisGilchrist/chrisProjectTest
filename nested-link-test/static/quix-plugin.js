@@ -1,37 +1,43 @@
 (function (global) {
-  const QuixPlugin = {
+  var VERSION = '1.0.0';
 
-    _log: function (emoji, label, data) {
-      const badge = 'background: #1976d2; color: white; padding: 2px 6px; border-radius: 3px; font-weight: bold;';
-      const text = 'color: #1976d2; font-weight: bold;';
+  var styles = {
+    badge:    'background: #6C63FF; color: #fff; padding: 2px 8px; border-radius: 20px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px;',
+    version:  'color: #999; font-size: 10px;',
+    success:  'color: #22c55e; font-weight: 600;',
+    info:     'color: #6C63FF; font-weight: 600;',
+    muted:    'color: #888; font-size: 11px;',
+    data:     'color: #f59e0b; font-weight: 600;',
+  };
 
-      // Log inside iframe context
-      if (data !== undefined) {
-        console.log('%c QuixPlugin %c ' + emoji + ' ' + label, badge, text, data);
-      } else {
-        console.log('%c QuixPlugin %c ' + emoji + ' ' + label, badge, text);
-      }
+  function log(level, message, data) {
+    var style = styles[level] || styles.info;
+    if (data !== undefined) {
+      console.log('%c Quix %c ' + message, styles.badge, style, data);
+    } else {
+      console.log('%c Quix %c ' + message, styles.badge, style);
+    }
+    // Relay structured event to parent portal
+    window.parent.postMessage({ type: 'quixplugin-log', level: level, message: message, data: data }, '*');
+  }
 
-      // Relay to parent so it shows in the main page console
-      window.parent.postMessage({ type: 'quixplugin-log', emoji: emoji, label: label, data: data }, '*');
-    },
+  var QuixPlugin = {
 
     // ── Navigation ──────────────────────────────────────────
     _syncRoute: function () {
-      const path = window.location.pathname;
-      QuixPlugin._log('📍', 'navigate →', path);
+      var path = window.location.pathname;
+      log('info', '⟶ navigate ' + path);
       window.parent.postMessage({ type: 'navigate', path: path }, '*');
     },
 
     _initNavigation: function () {
-      const push = history.pushState.bind(history);
-      const replace = history.replaceState.bind(history);
+      var push = history.pushState.bind(history);
+      var replace = history.replaceState.bind(history);
 
-      history.pushState = function (...args) { push(...args); QuixPlugin._syncRoute(); };
-      history.replaceState = function (...args) { replace(...args); QuixPlugin._syncRoute(); };
+      history.pushState = function () { push.apply(history, arguments); QuixPlugin._syncRoute(); };
+      history.replaceState = function () { replace.apply(history, arguments); QuixPlugin._syncRoute(); };
 
-      window.addEventListener('popstate', () => QuixPlugin._syncRoute());
-      QuixPlugin._log('🧭', 'Navigation sync ready');
+      window.addEventListener('popstate', function () { QuixPlugin._syncRoute(); });
       QuixPlugin._syncRoute();
     },
 
@@ -44,27 +50,31 @@
     },
 
     _handleToken: function (token) {
-      QuixPlugin._log('🔑', 'Token received', token.substring(0, 40) + '...');
-      this._tokenCallbacks.forEach(fn => fn(token));
+      log('success', '✓ Auth token received', token.substring(0, 20) + '••••');
+      this._tokenCallbacks.forEach(function (fn) { fn(token); });
     },
 
     _initToken: function () {
-      function messageHandler(event) {
-        if (event.data?.type !== 'AUTH_TOKEN' || !event.data.token) return;
-        QuixPlugin._handleToken(event.data.token);
-      }
-      window.addEventListener('message', messageHandler);
-      QuixPlugin._log('🔐', 'Requesting token from parent...');
+      window.addEventListener('message', function (event) {
+        if (event.data && event.data.type === 'AUTH_TOKEN' && event.data.token) {
+          QuixPlugin._handleToken(event.data.token);
+        }
+      });
+      log('muted', '⟳ Requesting auth token...');
       window.parent.postMessage({ type: 'REQUEST_AUTH_TOKEN' }, '*');
     },
 
     // ── Init ─────────────────────────────────────────────────
     init: function () {
-      console.group('%c QuixPlugin SDK ', 'background: #1976d2; color: white; padding: 2px 8px; border-radius: 3px; font-weight: bold; font-size: 11px;');
-      QuixPlugin._log('🚀', 'Initialising...');
+      console.groupCollapsed(
+        '%c Quix Plugin SDK %c v' + VERSION,
+        styles.badge,
+        styles.version
+      );
+      log('info',    '◎ Initialising');
       this._initNavigation();
       this._initToken();
-      QuixPlugin._log('✅', 'Ready');
+      log('success', '✓ Ready');
       console.groupEnd();
       return this;
     }

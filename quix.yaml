@@ -402,6 +402,36 @@ deployments:
       cpu: 200
       memory: 200
       replicas: 1
+  - name: Nested Link Test
+    application: nested-link-test
+    deploymentType: Service
+    version: latest
+    desiredStatus: Running
+    resources:
+      cpu: 200
+      memory: 200
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: nested-link-test
+    network:
+      ports:
+        - port: 80
+          targetPort: 80
+    plugin:
+      embeddedView:
+        enabled: true
+        hideHeader: true
+        default: true
+      sidebarItem:
+        show: true
+        label: Nested Link Test
+        icon: link
+        order: 10
+      globalItem:
+        show: true
+        label: Nested Link Test
+        order: 10
 
 # This section describes the Topics of the data pipeline
 topics:

@@ -16,32 +16,27 @@
     } else {
       console.log('%c Quix %c ' + message, styles.badge, style);
     }
-    window.parent.postMessage({ type: 'quixplugin-log', level: level, message: message, data: data }, '*');
   }
 
   var QuixPlugin = {
 
     _groupOpen: false,
 
-    // ── Navigation ──────────────────────────────────────────
     _syncRoute: function () {
       var path = window.location.pathname;
       log('info', '⟶ navigate ' + path);
-      window.parent.postMessage({ type: 'navigate', path: path }, '*');
+      window.parent.postMessage({ type: 'NAVIGATE', path: path }, '*');
     },
 
     _initNavigation: function () {
       var push = history.pushState.bind(history);
       var replace = history.replaceState.bind(history);
-
       history.pushState = function () { push.apply(history, arguments); QuixPlugin._syncRoute(); };
       history.replaceState = function () { replace.apply(history, arguments); QuixPlugin._syncRoute(); };
-
       window.addEventListener('popstate', function () { QuixPlugin._syncRoute(); });
       QuixPlugin._syncRoute();
     },
 
-    // ── Auth Token ──────────────────────────────────────────
     _tokenCallbacks: [],
 
     onToken: function (callback) {
@@ -51,7 +46,6 @@
 
     _handleToken: function (token) {
       log('success', '✓ Auth token received', token.substring(0, 20) + '••••');
-      // Close the init group now that async token has arrived
       if (QuixPlugin._groupOpen) {
         console.groupEnd();
         QuixPlugin._groupOpen = false;
@@ -69,7 +63,6 @@
       window.parent.postMessage({ type: 'REQUEST_AUTH_TOKEN' }, '*');
     },
 
-    // ── Init ─────────────────────────────────────────────────
     init: function () {
       console.groupCollapsed(
         '%c Quix Plugin SDK %c v' + VERSION,
@@ -81,7 +74,6 @@
       this._initNavigation();
       this._initToken();
       log('success', '✓ Ready');
-      // NOTE: groupEnd() is intentionally deferred — called in _handleToken once token arrives
       return this;
     }
 

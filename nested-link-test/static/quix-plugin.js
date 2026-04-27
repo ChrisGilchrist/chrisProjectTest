@@ -23,7 +23,7 @@
     _groupOpen: false,
 
     _syncRoute: function () {
-      var path = window.location.pathname;
+      var path = window.location.pathname + window.location.search + window.location.hash;
       log('info', '⟶ navigate ' + path);
       window.parent.postMessage({ type: 'NAVIGATE', path: path }, '*');
     },

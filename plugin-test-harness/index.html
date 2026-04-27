@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quix Plugin Test Harness</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: monospace; background: #0a0a0a; color: #e0e0e0; height: 100vh; display: flex; flex-direction: column; }
+
+    .header {
+      background: #111; border-bottom: 1px solid #222;
+      padding: 12px 16px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .header-title { color: #0064ff; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
+    .header-row { display: flex; gap: 24px; font-size: 11px; }
+    .label { color: #555; }
+    .value { color: #fff; }
+    .token-value { color: #22c55e; }
+    .no-token { color: #666; }
+
+    .nav { background: #111; border-bottom: 1px solid #1a1a1a; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .section-label { color: #444; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; align-self: center; margin-right: 4px; }
+
+    button {
+      padding: 5px 10px; font-size: 11px; font-family: monospace;
+      background: #1a1a1a; color: #ccc; border: 1px solid #333;
+      border-radius: 4px; cursor: pointer; transition: all 0.15s;
+    }
+    button:hover { background: #0064ff; color: #fff; border-color: #0064ff; }
+    button.danger:hover { background: #dc2626; border-color: #dc2626; }
+    button.warn:hover { background: #f59e0b; color: #000; border-color: #f59e0b; }
+
+    .divider { width: 1px; background: #222; margin: 0 4px; }
+
+    .log-container { flex: 1; overflow-y: auto; padding: 12px 16px; }
+    .log-entry { font-size: 11px; padding: 3px 0; border-bottom: 1px solid #111; display: flex; gap: 12px; }
+    .log-time { color: #444; min-width: 80px; }
+    .log-type { min-width: 120px; }
+    .log-type.navigate { color: #0064ff; }
+    .log-type.token { color: #22c55e; }
+    .log-type.init { color: #f59e0b; }
+    .log-type.warn { color: #f59e0b; }
+    .log-type.error { color: #dc2626; }
+    .log-data { color: #888; }
+
+    .empty-log { color: #333; font-size: 12px; padding: 16px 0; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-title">⬡ Quix Plugin Test Harness</div>
+    <div class="header-row">
+      <div><span class="label">URL </span><span class="value" id="url-display">/</span></div>
+      <div><span class="label">Token </span><span id="token-display" class="no-token">awaiting...</span></div>
+      <div><span class="label">NAVIGATE count </span><span class="value" id="nav-count">0</span></div>
+      <div><span class="label">SDK </span><span class="value" id="sdk-status">not initialised</span></div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <span class="section-label">Routes</span>
+    <button onclick="go('/')">/ home</button>
+    <button onclick="go('/dashboard')">/ dashboard</button>
+    <button onclick="go('/settings#general')">/settings #general</button>
+    <button onclick="go('/settings#advanced')">/settings #advanced</button>
+    <button onclick="go('/items?filter=open')">/items?filter=open</button>
+    <button onclick="go('/items/42')">/items/42</button>
+
+    <div class="divider"></div>
+    <span class="section-label">History</span>
+    <button onclick="history.pushState({}, '', '/push-test-' + Date.now())">pushState</button>
+    <button onclick="history.replaceState({}, '', '/replace-test-' + Date.now())">replaceState</button>
+    <button onclick="window.location.hash = 'anchor-' + Date.now()" class="warn">change hash</button>
+    <button onclick="history.back()" class="warn">back</button>
+
+    <div class="divider"></div>
+    <span class="section-label">Edge cases</span>
+    <button onclick="doubleInit()" class="warn">double init</button>
+    <button onclick="lateToken()" class="warn">late onToken (2s)</button>
+    <button onclick="clearLog()" class="danger">clear log</button>
+  </div>
+
+  <div class="log-container" id="log">
+    <div class="empty-log">Waiting for events...</div>
+  </div>
+
+  <script src="/quix-plugin.js"></script>
+  <script>
+    var navCount = 0;
+    var cachedToken = null;
+    var initialised = false;
+
+    function $(id) { return document.getElementById(id); }
+
+    function updateUrl() {
+      $('url-display').textContent = location.pathname + location.search + location.hash;
+    }
+
+    function addLog(type, message, data) {
+      var container = $('log');
+      var empty = container.querySelector('.empty-log');
+      if (empty) empty.remove();
+
+      var entry = document.createElement('div');
+      entry.className = 'log-entry';
+
+      var time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+      entry.innerHTML =
+        '<span class="log-time">' + time + '</span>' +
+        '<span class="log-type ' + type + '">' + type.toUpperCase() + '</span>' +
+        '<span class="log-data">' + message + (data ? ' → ' + data : '') + '</span>';
+
+      container.insertBefore(entry, container.firstChild);
+    }
+
+    function clearLog() {
+      $('log').innerHTML = '<div class="empty-log">Log cleared.</div>';
+    }
+
+    function go(path) {
+      history.pushState({}, '', path);
+    }
+
+    function doubleInit() {
+      addLog('warn', 'calling QuixPlugin.init() again — should be no-op');
+      QuixPlugin.init();
+    }
+
+    function lateToken() {
+      addLog('warn', 'registering late onToken callback in 2s...');
+      setTimeout(function() {
+        QuixPlugin.onToken(function(token) {
+          addLog('token', 'late onToken fired', token.slice(0, 20) + '••••');
+        });
+      }, 2000);
+    }
+
+    // Mirror history API changes for URL display
+    var origPush = history.pushState;
+    history.pushState = function() { origPush.apply(this, arguments); updateUrl(); };
+    var origReplace = history.replaceState;
+    history.replaceState = function() { origReplace.apply(this, arguments); updateUrl(); };
+    window.addEventListener('popstate', updateUrl);
+    window.addEventListener('hashchange', updateUrl);
+
+    // Listen for NAVIGATE messages sent by SDK (to log them)
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'NAVIGATE') {
+        navCount++;
+        $('nav-count').textContent = navCount;
+        addLog('navigate', 'NAVIGATE posted', event.data.path);
+      }
+    });
+
+    // Init SDK
+    QuixPlugin
+      .onToken(function(token) {
+        cachedToken = token;
+        $('token-display').className = 'token-value';
+        $('token-display').textContent = token.slice(0, 20) + '••••';
+        addLog('token', 'onToken fired', token.slice(0, 20) + '••••');
+      })
+      .init();
+
+    $('sdk-status').textContent = 'initialised';
+    updateUrl();
+  </script>
+</body>
+</html>

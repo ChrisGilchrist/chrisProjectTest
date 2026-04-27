@@ -432,6 +432,36 @@ deployments:
         show: true
         label: Nested Link Test
         order: 10
+  - name: Plugin Test Harness
+    application: plugin-test-harness
+    deploymentType: Service
+    version: latest
+    desiredStatus: Running
+    resources:
+      cpu: 200
+      memory: 200
+      replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: plugin-test-harness
+    network:
+      ports:
+        - port: 80
+          targetPort: 80
+    plugin:
+      embeddedView:
+        enabled: true
+        hideHeader: true
+        default: true
+      sidebarItem:
+        show: true
+        label: Plugin Test Harness
+        icon: science
+        order: 11
+      globalItem:
+        show: true
+        label: Plugin Test Harness
+        order: 11
 
 # This section describes the Topics of the data pipeline
 topics:

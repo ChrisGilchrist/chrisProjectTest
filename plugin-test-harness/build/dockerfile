@@ -1,0 +1,6 @@
+FROM python:3.11-slim
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY --from=git /project .
+RUN pip install -r plugin-test-harness/requirements.txt
+ENTRYPOINT ["python3", "plugin-test-harness/main.py"]

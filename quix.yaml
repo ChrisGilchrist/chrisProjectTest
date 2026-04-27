@@ -325,9 +325,9 @@ deployments:
         description: The notebook file to open (e.g., main.py)
         value: main.py
       - name: ANTHROPIC_API_KEY
-        inputType: Secret
+        inputType: ProjectVariable
         description: Token generated from https://platform.claude.com/settings/keys.
-        secretKey: INFLUXDB_ADMIN_TOKEN
+        variableKey: INFLUXDB_ADMIN_TOKEN
     plugin:
       embeddedView:
         enabled: true
@@ -367,10 +367,10 @@ deployments:
         description: jjj
         value: Different222
       - name: secret
-        inputType: Secret
+        inputType: ProjectVariable
         description: kkk
         required: true
-        secretKey: INFLUXDB_ADMIN_TOKEN
+        variableKey: INFLUXDB_ADMIN_TOKEN
       - name: k
         inputType: FreeText
         description: k
@@ -404,9 +404,8 @@ deployments:
       replicas: 1
   - name: Nested Link Test
     application: nested-link-test
-    deploymentType: Service
     version: latest
-    desiredStatus: Running
+    deploymentType: Service
     resources:
       cpu: 200
       memory: 200
@@ -414,6 +413,7 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: nested-link-test
+    desiredStatus: Running
     network:
       ports:
         - port: 80
@@ -434,9 +434,8 @@ deployments:
         order: 10
   - name: Plugin Test Harness
     application: plugin-test-harness
-    deploymentType: Service
     version: latest
-    desiredStatus: Running
+    deploymentType: Service
     resources:
       cpu: 200
       memory: 200
@@ -444,6 +443,7 @@ deployments:
     publicAccess:
       enabled: true
       urlPrefix: plugin-test-harness
+    desiredStatus: Running
     network:
       ports:
         - port: 80

@@ -21,8 +21,11 @@
   var QuixPlugin = {
 
     _groupOpen: false,
+    _initialized: false,
 
     _syncRoute: function () {
+      // Send pathname + search + hash so the portal can mirror the full URL state
+      // (filters, hash anchors, etc), not just the route path.
       var path = window.location.pathname + window.location.search + window.location.hash;
       log('info', '⟶ navigate ' + path);
       window.parent.postMessage({ type: 'NAVIGATE', path: path }, '*');
@@ -34,12 +37,21 @@
       history.pushState = function () { push.apply(history, arguments); QuixPlugin._syncRoute(); };
       history.replaceState = function () { replace.apply(history, arguments); QuixPlugin._syncRoute(); };
       window.addEventListener('popstate', function () { QuixPlugin._syncRoute(); });
+      // Hash-only changes don't trigger pushState/popstate — listen for hashchange
+      // so plugins using hash routing also stay in sync.
+      window.addEventListener('hashchange', function () { QuixPlugin._syncRoute(); });
       QuixPlugin._syncRoute();
     },
 
     _tokenCallbacks: [],
+    _lastToken: null,
 
     onToken: function (callback) {
+      // If a token has already arrived, fire the callback immediately so late
+      // registrations don't miss it.
+      if (this._lastToken) {
+        try { callback(this._lastToken); } catch (e) { /* swallow */ }
+      }
       this._tokenCallbacks.push(callback);
       return this;
     },
@@ -50,6 +62,7 @@
         console.groupEnd();
         QuixPlugin._groupOpen = false;
       }
+      this._lastToken = token;
       this._tokenCallbacks.forEach(function (fn) { fn(token); });
     },
 
@@ -64,6 +77,11 @@
     },
 
     init: function () {
+      // Idempotent — repeat calls are no-ops. Prevents double-patching history
+      // and double NAVIGATE messages on every navigation.
+      if (this._initialized) return this;
+      this._initialized = true;
+
       console.groupCollapsed(
         '%c Quix Plugin SDK %c v' + VERSION,
         styles.badge,

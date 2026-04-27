@@ -9,6 +9,15 @@ variables:
     inputType: OutputTopic
     description: Name of the output topic to write to.
     defaultValue: transform
+  - name: VARIABLE_GROUP_SCHEMA
+    inputType: Group
+    multiline: false
+    description: test
+    defaultValue: variable-group-schema
+    variables:
+      - key: vairable
+        description: 'variable 1 description '
+        defaultValue: ttest2123
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

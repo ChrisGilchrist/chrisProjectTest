@@ -365,7 +365,7 @@ deployments:
       - name: Options
         inputType: Options
         description: jjj
-        value: Different222
+        value: {{ test }}
       - name: secret
         inputType: ProjectVariable
         description: kkk

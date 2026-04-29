@@ -370,7 +370,7 @@ deployments:
         inputType: ProjectVariable
         description: kkk
         required: true
-        variableKey: INFLUXDB_ADMIN_TOKEN
+        variableKey: fjsdjkfdshjksfd
       - name: k
         inputType: FreeText
         description: k

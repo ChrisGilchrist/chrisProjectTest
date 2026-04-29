@@ -1,5 +1,17 @@
 name: opc-ua-server
 language: python
+variables:
+  - name: test
+    inputType: Group
+    multiline: false
+    description: gg
+    defaultValue: TEST
+    variables:
+      - key: key
+        description: jj
+        defaultValue: jj
+      - key: jj
+        defaultValue: iii
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

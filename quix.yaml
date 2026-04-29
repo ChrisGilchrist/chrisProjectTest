@@ -296,7 +296,7 @@ deployments:
         inputType: OutputTopic
         description: Name of the output topic to write into
         required: true
-        value: f1-data
+        value: {{ TEST }}
   - name: Marimo
     application: marimo-4
     version: latest

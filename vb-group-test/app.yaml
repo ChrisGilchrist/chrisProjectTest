@@ -18,6 +18,17 @@ variables:
       - key: vairable
         description: 'variable 1 description '
         defaultValue: ttest2123
+  - name: chrisTest123
+    inputType: Group
+    multiline: false
+    description: thIS IS A TEST
+    defaultValue: CHRISTEST123
+    required: true
+    variables:
+      - key: key1
+        description: kkk
+        defaultValue: kkk
+        required: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

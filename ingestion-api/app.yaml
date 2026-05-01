@@ -5,6 +5,19 @@ variables:
     inputType: Secret
     multiline: false
     defaultValue: jjj
+  - name: j
+    inputType: Group
+    multiline: false
+    defaultValue: J
+    variables:
+      - key: j
+        description: j
+        defaultValue: j
+        required: true
+      - key: jj
+        required: true
+      - key: sxs
+        required: true
 dockerfile: dockerfile
 defaultFile: main.js
 libraryItemId: nodejs-starter-template

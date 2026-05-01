@@ -15,8 +15,14 @@ variables:
         defaultValue: j
         required: true
       - key: jj
+        description: 888
+        defaultValue: 8
+        secret: true
         required: true
       - key: sxs
+        description: 88
+        defaultValue: 8
+        secret: true
         required: true
 dockerfile: dockerfile
 defaultFile: main.js

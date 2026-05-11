@@ -17,11 +17,15 @@ variables:
     inputType: FreeText
     multiline: false
     defaultValue: dfg
+  - name: test123
+    inputType: Group
+    multiline: false
+    description: uuu
+    defaultValue: TEST123
+    variables:
+      - key: test
+      - key: test2
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py
 libraryItemId: starter-transformation
-includedFolders:
-  - angular-starter-template/public
-  - angular-starter-template/src/app/components/active-streams
-  - angular-starter-template/src/assets

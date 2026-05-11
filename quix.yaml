@@ -374,6 +374,11 @@ deployments:
         description: kkk
         required: true
         variableKey: fjsdjkfdshjksfd
+      - name: secret
+        inputType: Secret
+        description: kkk
+        required: true
+        secretKey: fjsdjkfdshjksfd
       - name: k
         inputType: FreeText
         description: k

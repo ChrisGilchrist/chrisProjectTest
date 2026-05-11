@@ -207,7 +207,7 @@ deployments:
       size: 1
     network:
       ports:
-        - port: 80
+        - port: {{ testtt }}
           targetPort: 3000
   - name: Quix DataLake Sink
     application: DataLake.Sink

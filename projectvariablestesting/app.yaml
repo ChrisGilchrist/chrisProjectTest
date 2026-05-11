@@ -12,7 +12,7 @@ variables:
   - name: variable
     inputType: ProjectVariable
     multiline: false
-    defaultValue: 888
+    defaultValue: chrisTest
   - name: secretVariable
     inputType: ProjectVariable
     multiline: false

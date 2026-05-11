@@ -1,6 +1,10 @@
 name: ProjectOne
 language: nodejs
-variables: []
+variables:
+  - name: secretTest
+    inputType: Secret
+    multiline: false
+    defaultValue: kkkk
 dockerfile: dockerfile
 runEntryPoint: main.js
 defaultFile: main.js

@@ -25,6 +25,8 @@ variables:
     variables:
       - key: test
       - key: test2
+      - key: test3
+      - key: test4
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

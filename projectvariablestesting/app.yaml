@@ -13,6 +13,10 @@ variables:
     inputType: ProjectVariable
     multiline: false
     defaultValue: 888
+  - name: secretVariable
+    inputType: ProjectVariable
+    multiline: false
+    defaultValue: 888
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

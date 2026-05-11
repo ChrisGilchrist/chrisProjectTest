@@ -374,7 +374,7 @@ deployments:
         description: kkk
         required: true
         variableKey: fjsdjkfdshjksfd
-      - name: secret
+      - name: secret2
         inputType: Secret
         description: kkk
         required: true

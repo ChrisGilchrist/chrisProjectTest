@@ -14,8 +14,8 @@ deployments:
     version: 18677aa892b429eb4230774f7dc9fad466166d96
     deploymentType: Job
     resources:
-      cpu: {{ te00st }}
-      memory: {{ cooool }}
+      cpu: 20
+      memory: 2001
       replicas: 1
     variables:
       - name: output

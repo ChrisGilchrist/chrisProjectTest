@@ -13,6 +13,10 @@ variables:
     inputType: InputTopic
     multiline: false
     defaultValue: first_topic
+  - name: output2
+    inputType: OutputTopic
+    multiline: false
+    defaultValue: output-topic
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

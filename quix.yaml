@@ -472,7 +472,7 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
+      cpu: {{ cpuValue }}
       memory: 500
       replicas: 1
     variables:

@@ -313,7 +313,7 @@ deployments:
       size: 1
     network:
       ports:
-        - port: {{ port1 }}
+        - port: {{ port12 }}
           targetPort: 8080
     variables:
       - name: MARIMO_MODE

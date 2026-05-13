@@ -302,7 +302,7 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 500
+      cpu: {{CPU_VAR}}
       memory: 2000
       replicas: 1
     publicAccess:

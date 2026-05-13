@@ -11,7 +11,7 @@ deployments:
     version: 18677aa892b429eb4230774f7dc9fad466166d96
     deploymentType: Job
     resources:
-      cpu: 200
+      cpu: {{ test }}
       memory: 200
       replicas: 1
     variables:

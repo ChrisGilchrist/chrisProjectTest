@@ -6,6 +6,9 @@ variables:
     description: Name of the output topic to write into
     defaultValue: csv-data
     required: true
+  - name: Test
+    inputType: ProjectVariable
+    multiline: false
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

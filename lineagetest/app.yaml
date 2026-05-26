@@ -22,6 +22,10 @@ variables:
     multiline: false
     description: hh
     defaultValue: TEST
+  - name: jj
+    inputType: FreeText
+    multiline: false
+    defaultValue: JJJJ
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

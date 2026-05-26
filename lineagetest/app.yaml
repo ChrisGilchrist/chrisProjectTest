@@ -17,6 +17,11 @@ variables:
     inputType: OutputTopic
     multiline: false
     defaultValue: output-topic
+  - name: test
+    inputType: FreeText
+    multiline: false
+    description: hh
+    defaultValue: TEST
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

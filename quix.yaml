@@ -262,7 +262,7 @@ deployments:
         inputType: ProjectVariable
         value: fdgflh
         required: true
-        secret: true
+        isSecret: true
       - name: fgf
         inputType: OutputTopic
         value: ghf

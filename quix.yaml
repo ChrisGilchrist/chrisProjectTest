@@ -259,8 +259,8 @@ deployments:
         description: Name of the input topic to listen to.
         value: csv-data
       - name: chfid
-        inputType: InputTopic
-        value: {{ test12345 }}
+        inputType: ProjectVariable
+        value: fdgfh
         secret: true
       - name: fgf
         inputType: OutputTopic

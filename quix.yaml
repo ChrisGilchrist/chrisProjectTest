@@ -261,7 +261,7 @@ deployments:
       - name: chfid
         inputType: InputTopic
         value: {{ test12345 }}
-        isSecret: true
+        secret: true
       - name: fgf
         inputType: OutputTopic
         value: ghf

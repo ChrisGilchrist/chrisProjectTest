@@ -261,6 +261,7 @@ deployments:
       - name: chfid
         inputType: ProjectVariable
         value: fdgflh
+        required: true
       - name: fgf
         inputType: OutputTopic
         value: ghf

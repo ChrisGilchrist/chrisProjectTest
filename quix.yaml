@@ -260,7 +260,8 @@ deployments:
         value: csv-data
       - name: chfid
         inputType: InputTopic
-        value: f1-dataaaa
+        value: {{ test12345 }}
+        isSecret: true
       - name: fgf
         inputType: OutputTopic
         value: ghf

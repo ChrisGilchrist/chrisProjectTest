@@ -63,6 +63,14 @@ variables:
       - key: INFLUXDB_TOKEN
         description: InfluxDB API token.
         secret: true
+  - name: group122343
+    inputType: VariableGroup
+    description: hjhjk
+    variableGroupId: hjhh
+    variableGroupName: hjh
+    variableGroupDescription: hjhjk
+    variables:
+      - key: hjkhjk
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

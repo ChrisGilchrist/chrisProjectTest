@@ -49,6 +49,20 @@ variables:
     inputType: InputTopic
     multiline: false
     defaultValue: first_topic
+  - name: group1
+    inputType: VariableGroup
+    description: Variable Group describing an InfluxDB connection. The selected value set's keys are injected as individual environment variables at runtime.
+    variableGroupId: influxdb-demo
+    variableGroupName: INFLUXDB_CONNECTION
+    variableGroupDescription: Variable Group describing an InfluxDB connection. The selected value set's keys are injected as individual environment variables at runtime.
+    variables:
+      - key: INFLUXDB_HOST
+        description: InfluxDB hostname.
+      - key: INFLUXDB_PORT
+        description: InfluxDB port.
+      - key: INFLUXDB_TOKEN
+        description: InfluxDB API token.
+        secret: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

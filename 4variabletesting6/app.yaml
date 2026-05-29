@@ -63,6 +63,15 @@ variables:
       - key: INFLUXDB_TOKEN
         description: InfluxDB API token.
         secret: true
+  - name: group2
+    inputType: VariableGroup
+    description: iii
+    variableGroupId: redis-credentials
+    variableGroupName: chrisTest
+    variableGroupDescription: iii
+    variables:
+      - key: iii
+        required: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

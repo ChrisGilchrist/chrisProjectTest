@@ -20,10 +20,12 @@ variables:
       - key: FEATURE_NEW_DASHBOARD
         description: New dashboard
         defaultValue: k
+        secret: true
         required: true
       - key: FEATURE_BETA_PIPELINES
         description: Beta pipelines
         defaultValue: k
+        secret: true
         required: true
       - key: FEATURE_AI_ASSIST
         description: AI assist

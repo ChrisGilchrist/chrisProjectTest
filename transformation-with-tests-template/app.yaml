@@ -9,6 +9,20 @@ variables:
     inputType: OutputTopic
     description: Name of the output topic to write to.
     defaultValue: transform
+  - name: group1
+    inputType: VariableGroup
+    multiline: false
+    description: Per-environment toggles for in-progress features.
+    variableGroupId: feature-flags
+    variableGroupName: Feature Flags
+    variableGroupDescription: Per-environment toggles for in-progress features.
+    variables:
+      - key: FEATURE_NEW_DASHBOARD
+        description: New dashboard
+      - key: FEATURE_BETA_PIPELINES
+        description: Beta pipelines
+      - key: FEATURE_AI_ASSIST
+        description: AI assist
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

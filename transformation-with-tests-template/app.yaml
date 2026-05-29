@@ -19,10 +19,16 @@ variables:
     variables:
       - key: FEATURE_NEW_DASHBOARD
         description: New dashboard
+        defaultValue: k
+        required: true
       - key: FEATURE_BETA_PIPELINES
         description: Beta pipelines
+        defaultValue: k
+        required: true
       - key: FEATURE_AI_ASSIST
         description: AI assist
+        defaultValue: k
+        required: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

@@ -12,7 +12,7 @@ deployments:
     deploymentType: Job
     resources:
       cpu: {{ test1 }}
-      memory: 200
+      memory: 201
       replicas: 1
     variables:
       - name: output

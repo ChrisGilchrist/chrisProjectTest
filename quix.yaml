@@ -308,7 +308,7 @@ deployments:
       - name: ANTHROPIC_API_KEY
         inputType: ProjectVariable
         description: Token generated from https://platform.claude.com/settings/keys.
-        variableKey: sasajhsdjkfsdhjkfhsjdkf
+        variableKey: sasajhsdjkfsdhjkfhsjdkfl
     plugin:
       embeddedView:
         enabled: true

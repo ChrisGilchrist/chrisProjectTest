@@ -309,6 +309,7 @@ deployments:
         inputType: ProjectVariable
         description: Token generated from https://platform.claude.com/settings/keys.
         variableKey: sasajhsdjkfsdhjkfhsjdkfl
+        secret: true
     plugin:
       embeddedView:
         enabled: true

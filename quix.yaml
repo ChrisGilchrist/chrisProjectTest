@@ -354,6 +354,11 @@ deployments:
         description: kkk
         required: true
         variableKey: fjsdjkfdshjksfd
+      - name: projectVariable2
+        inputType: ProjectVariable
+        description: kkk
+        required: true
+        variableKey: projectVariable2
       - name: secret2
         inputType: ProjectVariable
         description: kkk

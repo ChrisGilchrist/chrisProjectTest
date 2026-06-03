@@ -76,6 +76,7 @@ variables:
     inputType: ProjectVariable
     defaultValue: chrisTest
     required: true
+    secret: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

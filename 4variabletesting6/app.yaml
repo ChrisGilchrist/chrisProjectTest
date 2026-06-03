@@ -35,11 +35,12 @@ variables:
       - label: Different
         value: Different222
   - name: secret
-    inputType: Secret
+    inputType: ProjectVariable
     multiline: false
     description: kkk
     defaultValue: INFLUXDB_ADMIN_TOKEN
     required: true
+    secret: true
   - name: k
     inputType: FreeText
     multiline: false
@@ -71,6 +72,11 @@ variables:
     variableGroupDescription: hjhjk
     variables:
       - key: hjkhjk
+  - name: VariableSecret
+    inputType: ProjectVariable
+    defaultValue: chrisTest
+    required: true
+    secret: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

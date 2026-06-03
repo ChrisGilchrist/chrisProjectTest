@@ -353,6 +353,7 @@ deployments:
         inputType: ProjectVariable
         description: kkk
         required: true
+        secret: true
         variableKey: fjsdjkfdshjksfd
       - name: projectVariable2
         inputType: ProjectVariable

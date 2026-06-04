@@ -11,8 +11,9 @@ deployments:
     version: 18677aa892b429eb4230774f7dc9fad466166d96
     deploymentType: Job
     resources:
-      cpu: {{ test1 }}
-      memory: 201
+      limits:
+        cpu: {{ test1 }}
+        memory: 201
       replicas: 1
     variables:
       - name: output
@@ -26,8 +27,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     publicAccess:
       enabled: true
@@ -54,8 +56,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     publicAccess:
       enabled: true
@@ -82,8 +85,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     publicAccess:
       enabled: true
@@ -110,8 +114,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     publicAccess:
       enabled: true
@@ -135,8 +140,9 @@ deployments:
     version: latest
     deploymentType: Job
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     variables:
       - name: input
@@ -153,8 +159,9 @@ deployments:
     version: latest
     deploymentType: Job
     resources:
-      cpu: 200
-      memory: 200
+      limits:
+        cpu: 200
+        memory: 200
       replicas: 1
     variables:
       - name: output
@@ -166,8 +173,9 @@ deployments:
     image: qdrant/qdrant:v1.8.3
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     publicAccess:
       enabled: true
@@ -185,16 +193,18 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 15600
+      limits:
+        cpu: 200
+        memory: 15600
       replicas: 1
   - name: ingestion-api
     application: ingestion-api
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     publicAccess:
       enabled: true
@@ -211,8 +221,9 @@ deployments:
     version: latest
     deploymentType: Managed
     resources:
-      cpu: 500
-      memory: 1500
+      limits:
+        cpu: 500
+        memory: 1500
       replicas: 1
     configuration:
       topic: first_topic
@@ -222,8 +233,9 @@ deployments:
     version: 20251003.1-2025-10-user-flow
     deploymentType: Managed
     resources:
-      cpu: 500
-      memory: 1000
+      limits:
+        cpu: 500
+        memory: 1000
       replicas: 1
     publicAccess:
       enabled: true
@@ -250,8 +262,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 2100
-      memory: 500
+      limits:
+        cpu: 2100
+        memory: 500
       replicas: 1
     variables:
       - name: input
@@ -269,8 +282,9 @@ deployments:
     version: latest
     deploymentType: Job
     resources:
-      cpu: 200
-      memory: 200
+      limits:
+        cpu: 200
+        memory: 200
       replicas: 1
     variables:
       - name: output
@@ -283,8 +297,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: {{CPU_VAR}}
-      memory: 2000
+      limits:
+        cpu: {{CPU_VAR}}
+        memory: 2000
       replicas: 1
     publicAccess:
       enabled: true
@@ -294,7 +309,7 @@ deployments:
       size: 1
     network:
       ports:
-        - port: {{ port12 }}
+        - port: 50
           targetPort: 8080
     variables:
       - name: MARIMO_MODE
@@ -308,9 +323,9 @@ deployments:
       - name: ANTHROPIC_API_KEY
         inputType: ProjectVariable
         description: Token generated from https://platform.claude.com/settings/keys.
-        variableKey: sasajhsdjkfsdhjkfhsjdkfl
-        secret: true
         required: true
+        secret: true
+        variableKey: sasajhsdjkfsdhjkfhsjdkfl
     plugin:
       embeddedView:
         enabled: true
@@ -325,8 +340,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     variables:
       - name: input
@@ -375,8 +391,9 @@ deployments:
     image: test
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
     state:
       enabled: true
@@ -385,23 +402,26 @@ deployments:
     image: 7567
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 500
+      limits:
+        cpu: 200
+        memory: 500
       replicas: 1
   - name: 33
     image: 333
     deploymentType: Job
     resources:
-      cpu: 200
-      memory: 200
+      limits:
+        cpu: 200
+        memory: 200
       replicas: 1
   - name: Nested Link Test
     application: nested-link-test
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 200
+      limits:
+        cpu: 200
+        memory: 200
       replicas: 1
     publicAccess:
       enabled: true
@@ -430,8 +450,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 200
-      memory: 200
+      limits:
+        cpu: 200
+        memory: 200
       replicas: 1
     publicAccess:
       enabled: true
@@ -460,8 +481,9 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: {{ cpuValue }}
-      memory: 500
+      limits:
+        cpu: {{ cpuValue }}
+        memory: 500
       replicas: 1
     variables:
       - name: input
@@ -491,3 +513,4 @@ topics:
   - name: csv-data
   - name: ghf
   - name: transform
+  - name: test

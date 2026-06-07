@@ -500,6 +500,21 @@ deployments:
       - name: secretVariable
         inputType: ProjectVariable
         variableKey: 888
+  - name: Demo Data Source 4
+    application: demo-data-source-4
+    version: latest
+    deploymentType: Job
+    resources:
+      limits:
+        cpu: 200
+        memory: 200
+      replicas: 1
+    variables:
+      - name: output
+        inputType: OutputTopic
+        description: Name of the output topic to write into
+        required: true
+        value: f1-data
 
 # This section describes the Topics of the data pipeline
 topics:

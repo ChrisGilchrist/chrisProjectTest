@@ -14,13 +14,6 @@ deployments:
       limits:
         cpu: {{ test1 }}
         memory: 201
-      replicas: 1
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
-        value: f1-data
     disabled: true
   - name: Quix Pipeline Monitor
     application: quix-pipeline-monitor
@@ -30,7 +23,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: quix-pipeline-monitor
@@ -59,7 +51,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: crypto-stream-dashboard
@@ -88,7 +79,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: f1-mercedes-dashboard
@@ -117,7 +107,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: qdrant-qdrant-v1-8-3t
@@ -143,16 +132,8 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     variables:
-      - name: input
-        inputType: InputTopic
-        description: The topic to read from
-        required: true
-        value: hello-world-source
       - name: bearer_token
-        inputType: FreeText
-        description: ''
         value: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlpXeUJqWTgzcXotZW1pUlZDd1I4dyJ9.eyJpc3MiOiJodHRwczovL2F1dGguZGV2LnF1aXguYWkvIiwic3ViIjoiYXV0aDB8MjE5MWU0YjYtYzc0MC00ZWUyLTlmOTUtYTExNWQyNzBhNWMwIiwiYXVkIjpbImh0dHBzOi8vcG9ydGFsLWFwaS5kZXYucXVpeC5haS8iLCJodHRwczovL3F1aXgtZGV2LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3NjQ3NjgyODMsImV4cCI6MTc2NzM2MDI4Mywic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsImF6cCI6IjYwNEE5cTVWb2NZb3ZvTlBvTWlqdWVVWmNFSEljbE1zIiwicGVybWlzc2lvbnMiOltdfQ.sdJuHgmDiAhJHv5eEam6NsAJbNnU_BXRbMPpdv76LXj5ymHigmjKAa4PbP1SQFjEVPKl-O9y9p1oO8CLxIesvMKErV28lrpJ7ku75AqVP8_ASCtFj2v6ee1jeLTUnWcw_3I_UJ5FuFau4Ofwkj_rHbJb2yOF4OH2wfh8Mz_A4ciliPdnQhMwALKZRZvePxgDydQUi4xeZK_1CTKZV3ukRUBeD-vhK6lNrF12IMYOQJgfNTC6O2472Iz5b4IbWsADC1Nd-uFM8lAtT0EWjI_PY8DizF9uJtT4aNrNsN4pUxZbQiIgXbct0m5Y3Ay58t35efGngNBT03q5oAHPLmyjwg
   - name: Demo Data Source 2
     application: demo-data-source-2
@@ -162,13 +143,6 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
-        value: f1-data
   - name: Qdrant
     image: qdrant/qdrant:v1.8.3
     deploymentType: Service
@@ -176,7 +150,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: qdrant-qdrant-v1-8-3
@@ -196,7 +169,6 @@ deployments:
       limits:
         cpu: 200
         memory: 15600
-      replicas: 1
   - name: ingestion-api
     application: ingestion-api
     version: latest
@@ -205,7 +177,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: ingestion-api-c7f9695
@@ -224,7 +195,6 @@ deployments:
       limits:
         cpu: 500
         memory: 1500
-      replicas: 1
     configuration:
       topic: first_topic
       indexRowCount: 100022
@@ -236,7 +206,6 @@ deployments:
       limits:
         cpu: 500
         memory: 1000
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: config-api-svc
@@ -265,7 +234,6 @@ deployments:
       limits:
         cpu: 2100
         memory: 500
-      replicas: 1
     variables:
       - name: input
         inputType: InputTopic
@@ -285,12 +253,8 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
     variables:
       - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
         value: {{ TEST }}
   - name: Marimo
     application: marimo-4
@@ -300,7 +264,6 @@ deployments:
       limits:
         cpu: {{CPU_VAR}}
         memory: 2000
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: marimo
@@ -312,19 +275,8 @@ deployments:
         - port: 50
           targetPort: 8080
     variables:
-      - name: MARIMO_MODE
-        inputType: Options
-        description: Mode to run Marimo in
-        value: run
-      - name: MARIMO_NOTEBOOK
-        inputType: FreeText
-        description: The notebook file to open (e.g., main.py)
-        value: main.py
       - name: ANTHROPIC_API_KEY
-        inputType: ProjectVariable
-        description: Token generated from https://platform.claude.com/settings/keys.
         required: true
-        secret: true
         variableKey: sasajhsdjkfsdhjkfhsjdkfl
     plugin:
       embeddedView:
@@ -343,35 +295,9 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     variables:
-      - name: input
-        inputType: InputTopic
-        description: Name of the input topic to listen to.
-        value: input_topic
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write to.
-        value: output-topic
-      - name: FreeText
-        inputType: FreeText
-        value: FreeText value
-      - name: MultiLine
-        inputType: FreeText
-        multiline: true
-        value: |
-          MultiLine value
       - name: Options
-        inputType: Options
-        description: jjj
         value: {{ test }}
-      - name: k
-        inputType: FreeText
-        description: k
-        value: kk
-      - name: cc
-        inputType: InputTopic
-        value: first_topic
   - name: kj
     image: test
     deploymentType: Service
@@ -379,7 +305,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
     state:
       enabled: true
       size: 1
@@ -390,7 +315,6 @@ deployments:
       limits:
         cpu: 200
         memory: 500
-      replicas: 1
   - name: 33
     image: 333
     deploymentType: Job
@@ -398,7 +322,6 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
   - name: Nested Link Test
     application: nested-link-test
     version: latest
@@ -407,7 +330,6 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: nested-link-test
@@ -438,7 +360,6 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
     publicAccess:
       enabled: true
       urlPrefix: plugin-test-harness
@@ -469,22 +390,6 @@ deployments:
       limits:
         cpu: {{ cpuValue }}
         memory: 500
-      replicas: 1
-    variables:
-      - name: input
-        inputType: InputTopic
-        description: Name of the input topic to listen to.
-        value: csv-data
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write to.
-        value: transform
-      - name: variable
-        inputType: ProjectVariable
-        variableKey: chrisTest
-      - name: secretVariable
-        inputType: ProjectVariable
-        variableKey: 888
   - name: Demo Data Source 4
     application: demo-data-source-4
     version: latest
@@ -493,13 +398,6 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
-        value: f1-data
   - name: Demo Data Source 5
     application: demo-data-source-5
     version: latest
@@ -508,13 +406,6 @@ deployments:
       limits:
         cpu: 200
         memory: 200
-      replicas: 1
-    variables:
-      - name: output
-        inputType: OutputTopic
-        description: Name of the output topic to write into
-        required: true
-        value: f1-data
 
 # This section describes the Topics of the data pipeline
 topics:

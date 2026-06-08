@@ -67,11 +67,12 @@ variables:
   - name: group122343
     inputType: VariableGroup
     description: hjhjk
-    variableGroupId: hjhh
+    variableGroupId: Patrick
     variableGroupName: hjh
-    variableGroupDescription: hjhjk
+    variableGroupDescription: Test description
     variables:
-      - key: hjkhjk
+      - key: var1
+      - key: var2
   - name: VariableSecret
     inputType: ProjectVariable
     description: jjjjj

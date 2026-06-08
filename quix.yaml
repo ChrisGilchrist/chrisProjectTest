@@ -2,7 +2,7 @@
 # This file describes the data pipeline and configuration of resources of a Quix Project.
 
 metadata:
-  version: 1.0
+  version: 2.0
 
 # This section describes the Deployments of the data pipeline
 deployments:
@@ -365,22 +365,6 @@ deployments:
         inputType: Options
         description: jjj
         value: {{ test }}
-      - name: secret
-        inputType: ProjectVariable
-        description: kkk
-        required: true
-        secret: true
-        variableKey: fjsdjkfdshjksfd
-      - name: projectVariable2
-        inputType: ProjectVariable
-        description: kkk
-        variableKey: projectVariable2
-      - name: secret2
-        inputType: ProjectVariable
-        description: kkk
-        required: true
-        secret: null
-        variableKey: chrisTest
       - name: k
         inputType: FreeText
         description: k

@@ -298,8 +298,6 @@ deployments:
     variables:
       - name: Options
         value: {{ test }}
-      - name: PlainVar
-        variableKey: cooool
   - name: kj
     image: test
     deploymentType: Service

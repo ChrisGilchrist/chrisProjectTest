@@ -64,15 +64,6 @@ variables:
       - key: INFLUXDB_TOKEN
         description: InfluxDB API token.
         secret: true
-  - name: group122343
-    inputType: VariableGroup
-    description: hjhjk
-    variableGroupId: Patrick
-    variableGroupName: hjh
-    variableGroupDescription: Test description
-    variables:
-      - key: var1
-      - key: var2
   - name: VariableSecret
     inputType: ProjectVariable
     description: jjjjj

@@ -379,6 +379,7 @@ deployments:
         inputType: ProjectVariable
         description: kkk
         required: true
+        secret: null
         variableKey: chrisTest
       - name: k
         inputType: FreeText

@@ -69,7 +69,7 @@ variables:
     description: jjjjj
     defaultValue: chrisTest
     required: true
-    secret: false
+    secret: true
   - name: PlainVar
     inputType: ProjectVariable
     defaultValue: chrisTest

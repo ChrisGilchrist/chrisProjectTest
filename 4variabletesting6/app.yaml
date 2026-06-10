@@ -74,6 +74,18 @@ variables:
     inputType: ProjectVariable
     defaultValue: chrisTest
     required: true
+  - name: group2
+    inputType: VariableGroup
+    description: Created for QA
+    variableGroupId: qa_s1_group
+    variableGroupName: QA S1 Group
+    variableGroupDescription: Created for QA
+    variables:
+      - key: S3_PLAIN_VAR
+        description: QA plain
+      - key: S3_SECRET_VAR
+        description: QA secret
+        secret: true
 dockerfile: dockerfile
 runEntryPoint: main.py
 defaultFile: main.py

@@ -422,6 +422,14 @@ deployments:
       limits:
         cpu: 200
         memory: 500
+  - name: vb group test
+    application: vb-group-test
+    version: latest
+    deploymentType: Service
+    resources:
+      limits:
+        cpu: 200
+        memory: 500
 
 # This section describes the Topics of the data pipeline
 topics:

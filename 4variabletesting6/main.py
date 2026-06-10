@@ -23,6 +23,16 @@ def main():
     https://quix.io/docs/quix-streams/processing.html
     """
 
+    # Log variable group values at startup
+    print("[Variable Group: INFLUXDB_CONNECTION]")
+    print(f"  INFLUXDB_HOST = {os.environ.get('INFLUXDB_HOST', 'not set')}")
+    print(f"  INFLUXDB_PORT = {os.environ.get('INFLUXDB_PORT', 'not set')}")
+    print(  "  INFLUXDB_TOKEN = ***")
+
+    print("[Variable Group: QA S1 Group]")
+    print(f"  S3_PLAIN_VAR = {os.environ.get('S3_PLAIN_VAR', 'not set')}")
+    print(  "  S3_SECRET_VAR = ***")
+
     # Setup necessary objects
     app = Application(
         consumer_group="my_transformation",

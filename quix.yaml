@@ -414,6 +414,14 @@ deployments:
       limits:
         cpu: 200
         memory: 500
+  - name: VariableTesting 3
+    application: 4variabletesting6
+    version: latest
+    deploymentType: Service
+    resources:
+      limits:
+        cpu: 200
+        memory: 500
 
 # This section describes the Topics of the data pipeline
 topics:
